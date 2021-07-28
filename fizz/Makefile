@@ -77,9 +77,9 @@ GENERATED :=
 OBJECTS :=
 
 GENERATED += $(OBJDIR)/Fizz.o
-GENERATED += $(OBJDIR)/Mesh.o
+GENERATED += $(OBJDIR)/Polygon.o
 OBJECTS += $(OBJDIR)/Fizz.o
-OBJECTS += $(OBJDIR)/Mesh.o
+OBJECTS += $(OBJDIR)/Polygon.o
 
 # Rules
 # #############################################
@@ -146,7 +146,7 @@ endif
 $(OBJDIR)/Fizz.o: src/Fizz.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/Mesh.o: src/Geometry/Mesh.cpp
+$(OBJDIR)/Polygon.o: src/Polygon.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
