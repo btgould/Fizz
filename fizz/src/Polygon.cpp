@@ -4,6 +4,8 @@
 #include <Nutella/Renderer/Renderer.hpp>
 
 namespace Fizz {
+	using namespace Nutella;
+
 	Polygon::Polygon(const std::vector<glm::vec2>& points, const glm::vec2& pos /*= {0.0, 0.0}*/)
 		: m_Points(points), m_NumPoints(points.size()), m_Position(pos), m_Rotation(0.0f),
 		  m_Scale(1.0f, 1.0f) {

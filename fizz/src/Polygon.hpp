@@ -8,8 +8,6 @@
 
 #include "PhysicsObject.hpp"
 
-using namespace Nutella;
-
 namespace Fizz {
 	class Polygon : public PhysicsObject {
 	  public:
@@ -28,7 +26,7 @@ namespace Fizz {
 		float m_Rotation;
 		glm::vec2 m_Scale;
 
-		Ref<VertexArray> m_VAO;
-		Ref<Shader> m_Shader;
+		Nutella::Ref<Nutella::VertexArray> m_VAO;
+		Nutella::Ref<Nutella::Shader> m_Shader;
 	};
 } // namespace Fizz

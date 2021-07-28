@@ -6,39 +6,42 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "Polygon.hpp"
 
-class FizzLayer : public Nutella::Layer {
+using namespace Nutella;
+
+class FizzLayer : public Layer {
   public:
 	FizzLayer()
 		: Layer("Fizziks Simulation"),
-		  m_CameraController((float) Nutella::Application::get().getWindow().GetWidth() /
-								 (float) Nutella::Application::get().getWindow().GetHeight(),
-							 true),
-		  m_Polygon({{-0.25, -0.25}, {0.25, -0.25}, {0.25, 0.25}, {0, 0.5}, {-0.25, 0.25}},
-					{0, 0}) {};
-
-	virtual void OnUpdate(Nutella::Timestep ts) override {
-		m_CameraController.OnUpdate(ts);
-
-		Nutella::Renderer::BeginScene(m_CameraController.GetCamera());
-		m_Polygon.Render();
-		Nutella::Renderer::EndScene();
+		  m_CameraController((float) Application::get().getWindow().GetWidth() /
+								 (float) Application::get().getWindow().GetHeight(),
+							 true) {
+		m_Polygon = CreateScopedRef<Fizz::Polygon, std::vector<glm::vec2>, glm::vec2>(
+			{{-0.25, -0.25}, {0.25, -0.25}, {0.25, 0.25}, {0, 0.5}, {-0.25, 0.25}}, {0, 0});
 	}
 
-	virtual void OnEvent(Nutella::Event& event) override { m_CameraController.OnEvent(event); }
+	virtual void OnUpdate(Timestep ts) override {
+		m_CameraController.OnUpdate(ts);
+
+		Renderer::BeginScene(m_CameraController.GetCamera());
+		m_Polygon->Render();
+		Renderer::EndScene();
+	}
+
+	virtual void OnEvent(Event& event) override { m_CameraController.OnEvent(event); }
 
   private:
-	Nutella::OrthoCamController m_CameraController;
+	OrthoCamController m_CameraController;
 
-	Fizz::Polygon m_Polygon;
+	ScopedRef<Fizz::PhysicsObject> m_Polygon;
 };
 
-class Sandbox : public Nutella::Application {
+class Sandbox : public Application {
   public:
 	Sandbox() { PushLayer(new FizzLayer()); }
 
 	~Sandbox() {}
 };
 
-Nutella::Application* Nutella::CreateApplication() {
+Application* Nutella::CreateApplication() {
 	return new Sandbox();
 }
