@@ -9,9 +9,16 @@
 #include "PhysicsObject.hpp"
 
 namespace Fizz {
+	enum class PolygonType { TRIANGLE, SQUARE, HEXAGON };
+
 	class Polygon : public PhysicsObject {
 	  public:
+		// Creates a polygon from a list of 2D points. Points should be given in counter-clockwise
+		// winding order. Initializes position to the given value.
 		Polygon(const std::vector<glm::vec2>& points, const glm::vec2& pos = {0.0, 0.0});
+		// Creates a regular polygon of the given type, scaled by the given amount. Initializes
+		// position to the given value.
+		Polygon(PolygonType type, float size, const glm::vec2& pos = {0.0, 0.0});
 		~Polygon();
 
 		virtual void Render() override;

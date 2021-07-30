@@ -15,8 +15,13 @@ class FizzLayer : public Layer {
 		  m_CameraController((float) Application::get().getWindow().GetWidth() /
 								 (float) Application::get().getWindow().GetHeight(),
 							 true) {
-		m_Polygon = CreateScopedRef<Fizz::Polygon, std::vector<glm::vec2>, glm::vec2>(
-			{{-0.25, -0.25}, {0.25, -0.25}, {0.25, 0.25}, {0, 0.5}, {-0.25, 0.25}}, {0, 0});
+
+		// m_Polygon = CreateScopedRef<Fizz::Polygon, std::vector<glm::vec2>, glm::vec2>(
+		// 	{{-0.25, -0.25}, {0.25, -0.25}, {0.25, 0.25}, {0, 0.5}, {-0.25, 0.25}}, {0, 0});
+
+		m_Polygon = CreateScopedRef<Fizz::Polygon>(Fizz::PolygonType::SQUARE, 0.2);
+		m_Polygon2 =
+			CreateScopedRef<Fizz::Polygon>(Fizz::PolygonType::TRIANGLE, 0.3, glm::vec2(2.0f, 0.0f));
 	}
 
 	virtual void OnUpdate(Timestep ts) override {
@@ -24,6 +29,7 @@ class FizzLayer : public Layer {
 
 		Renderer::BeginScene(m_CameraController.GetCamera());
 		m_Polygon->Render();
+		m_Polygon2->Render();
 		Renderer::EndScene();
 	}
 
@@ -33,6 +39,7 @@ class FizzLayer : public Layer {
 	OrthoCamController m_CameraController;
 
 	ScopedRef<Fizz::PhysicsObject> m_Polygon;
+	ScopedRef<Fizz::PhysicsObject> m_Polygon2;
 };
 
 class Sandbox : public Application {
