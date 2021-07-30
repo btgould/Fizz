@@ -4,6 +4,7 @@
 #include <imgui.h>
 
 #include "glm/gtc/matrix_transform.hpp"
+#include <glm/gtc/type_ptr.hpp>
 #include "Polygon.hpp"
 
 using namespace Nutella;
@@ -16,12 +17,12 @@ class FizzLayer : public Layer {
 								 (float) Application::get().getWindow().GetHeight(),
 							 true) {
 
-		// m_Polygon = CreateScopedRef<Fizz::Polygon, std::vector<glm::vec2>, glm::vec2>(
+		// m_Polygon = CreateRef<Fizz::Polygon, std::vector<glm::vec2>, glm::vec2>(
 		// 	{{-0.25, -0.25}, {0.25, -0.25}, {0.25, 0.25}, {0, 0.5}, {-0.25, 0.25}}, {0, 0});
 
-		m_Polygon = CreateScopedRef<Fizz::Polygon>(Fizz::PolygonType::SQUARE, 0.2);
+		m_Polygon = CreateRef<Fizz::Polygon>(Fizz::PolygonType::SQUARE, 0.2);
 		m_Polygon2 =
-			CreateScopedRef<Fizz::Polygon>(Fizz::PolygonType::TRIANGLE, 0.3, glm::vec2(2.0f, 0.0f));
+			CreateRef<Fizz::Polygon>(Fizz::PolygonType::TRIANGLE, 0.3, glm::vec2(2.0f, 0.0f));
 	}
 
 	virtual void OnUpdate(Timestep ts) override {
@@ -33,13 +34,29 @@ class FizzLayer : public Layer {
 		Renderer::EndScene();
 	}
 
+	virtual void OnImGuiRender() override {
+		// ImGui::Begin("Fizziks Debug");
+
+		ImGui::SliderFloat2("Support Direction", glm::value_ptr(m_SupportDir), -1.0f, 1.0f);
+
+		glm::vec2 support1 = m_Polygon->Support(m_SupportDir);
+		glm::vec2 support2 = m_Polygon2->Support(m_SupportDir);
+		glm::vec2 mkSupport = m_Polygon->MinkowskiDiffSupport(m_Polygon2, m_SupportDir);
+		
+		ImGui::Text("P1 Support: <%.3f, %.3f>", support1.x, support1.y);
+		ImGui::Text("P2 Support: <%.3f, %.3f>", support2.x, support2.y);
+		ImGui::Text("Minkowski Support: <%.3f, %.3f>", mkSupport.x, mkSupport.y);
+	}
+
 	virtual void OnEvent(Event& event) override { m_CameraController.OnEvent(event); }
 
   private:
 	OrthoCamController m_CameraController;
 
-	ScopedRef<Fizz::PhysicsObject> m_Polygon;
-	ScopedRef<Fizz::PhysicsObject> m_Polygon2;
+	glm::vec2 m_SupportDir;
+
+	Ref<Fizz::PhysicsObject> m_Polygon;
+	Ref<Fizz::PhysicsObject> m_Polygon2;
 };
 
 class Sandbox : public Application {

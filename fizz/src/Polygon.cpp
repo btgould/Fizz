@@ -85,4 +85,21 @@ namespace Fizz {
 
 		Renderer::Submit(m_VAO, m_Shader, trs);
 	}
+
+	glm::vec2 Polygon::Support(const glm::vec2& dir) {
+		NT_PROFILE_FUNC();
+
+		glm::vec2 supportPoint = m_Points[0];
+		float maxSupportDist = dir.x * supportPoint.x + dir.y * supportPoint.y;
+
+		for (int i = 1; i < m_NumPoints; i++) {
+			float currSupportDist = dir.x * m_Points[i].x + dir.y * m_Points[i].y;
+			if (currSupportDist > maxSupportDist) {
+				maxSupportDist = currSupportDist;
+				supportPoint = m_Points[i];
+			}
+		}
+
+		return supportPoint;
+	}
 } // namespace Fizz

@@ -23,6 +23,8 @@ namespace Fizz {
 
 		virtual void Render() override;
 
+		virtual glm::vec2 Support(const glm::vec2& dir) override;
+
 		inline glm::vec2 GetPos() { return m_Position; }
 
 	  private:
