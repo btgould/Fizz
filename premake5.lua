@@ -40,12 +40,12 @@ project "Fizz"
     }
     
     filter "configurations:Debug"
-        defines "NT_DEBUG"
+        defines {"NT_DEBUG", "NT_ENABLE_ASSERTS", "NT_PROFILE"}
         runtime "Debug"
         symbols "On"
 
     filter "configurations:Release"
-        defines "NT_RELEASE"
+        defines {"NT_RELEASE", "NT_PROFILE"}
         runtime "Release"
         optimize "On"
 

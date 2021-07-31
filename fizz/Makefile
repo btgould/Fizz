@@ -35,7 +35,7 @@ ifeq ($(config),debug)
 TARGETDIR = ../bin/Debug-linux-x86_64/Fizz
 TARGET = $(TARGETDIR)/Fizz
 OBJDIR = ../bin-int/Debug-linux-x86_64/Fizz
-DEFINES += -DNT_DEBUG
+DEFINES += -DNT_DEBUG -DNT_ENABLE_ASSERTS -DNT_PROFILE
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g -std=c++17
 LIBS += ../nutella/bin/Debug-linux-x86_64/Nutella/libNutella.so
@@ -46,7 +46,7 @@ else ifeq ($(config),release)
 TARGETDIR = ../bin/Release-linux-x86_64/Fizz
 TARGET = $(TARGETDIR)/Fizz
 OBJDIR = ../bin-int/Release-linux-x86_64/Fizz
-DEFINES += -DNT_RELEASE
+DEFINES += -DNT_RELEASE -DNT_PROFILE
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -std=c++17
 LIBS += ../nutella/bin/Release-linux-x86_64/Nutella/libNutella.so
