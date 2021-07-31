@@ -78,8 +78,10 @@ OBJECTS :=
 
 GENERATED += $(OBJDIR)/Fizz.o
 GENERATED += $(OBJDIR)/Polygon.o
+GENERATED += $(OBJDIR)/Simplex.o
 OBJECTS += $(OBJDIR)/Fizz.o
 OBJECTS += $(OBJDIR)/Polygon.o
+OBJECTS += $(OBJDIR)/Simplex.o
 
 # Rules
 # #############################################
@@ -147,6 +149,9 @@ $(OBJDIR)/Fizz.o: src/Fizz.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Polygon.o: src/Polygon.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/Simplex.o: src/Simplex.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
