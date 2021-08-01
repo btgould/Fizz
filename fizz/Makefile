@@ -77,9 +77,11 @@ GENERATED :=
 OBJECTS :=
 
 GENERATED += $(OBJDIR)/Fizz.o
+GENERATED += $(OBJDIR)/PhysicsObject.o
 GENERATED += $(OBJDIR)/Polygon.o
 GENERATED += $(OBJDIR)/Simplex.o
 OBJECTS += $(OBJDIR)/Fizz.o
+OBJECTS += $(OBJDIR)/PhysicsObject.o
 OBJECTS += $(OBJDIR)/Polygon.o
 OBJECTS += $(OBJDIR)/Simplex.o
 
@@ -146,6 +148,9 @@ endif
 # #############################################
 
 $(OBJDIR)/Fizz.o: src/Fizz.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/PhysicsObject.o: src/PhysicsObject.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Polygon.o: src/Polygon.cpp

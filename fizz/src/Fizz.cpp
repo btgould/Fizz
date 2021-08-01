@@ -26,17 +26,6 @@ class FizzLayer : public Layer {
 			CreateRef<Fizz::Polygon>(Fizz::PolygonType::TRIANGLE, 0.3, glm::vec2(1.0f, 0.0f));
 	}
 
-	virtual void OnAttach() override {
-		Fizz::Simplex simplex({{0.0f, 0.0f}, {0.0f, 1.0f}});
-
-		simplex.Add({1.0f, 0.0f});
-		simplex.Remove({0.0f, 0.0f});
-
-		for (glm::vec2 point : simplex) {
-			NT_TRACE("<{0}, {1}>", point.x, point.y);
-		}
-	}
-
 	virtual void OnUpdate(Timestep ts) override {
 		m_CameraController.OnUpdate(ts);
 
@@ -79,17 +68,8 @@ class FizzLayer : public Layer {
 
 		ImGui::Separator();
 
-		ImGui::Text("Support Points");
-
-		ImGui::SliderFloat2("Support Direction", glm::value_ptr(m_SupportDir), -1.0f, 1.0f);
-
-		glm::vec2 support1 = m_Polygon->Support(m_SupportDir);
-		glm::vec2 support2 = m_Polygon2->Support(m_SupportDir);
-		glm::vec2 mkSupport = m_Polygon->MinkowskiDiffSupport(m_Polygon2, m_SupportDir);
-
-		ImGui::Text("P1 Support: <%.3f, %.3f>", support1.x, support1.y);
-		ImGui::Text("P2 Support: <%.3f, %.3f>", support2.x, support2.y);
-		ImGui::Text("Minkowski Support: <%.3f, %.3f>", mkSupport.x, mkSupport.y);
+		ImGui::Text("Collision");
+		ImGui::Text("Colliding: %s", m_Polygon->GJKColliding(m_Polygon2) ? "true" : "false");
 
 		ImGui::End();
 	}
@@ -98,8 +78,6 @@ class FizzLayer : public Layer {
 
   private:
 	OrthoCamController m_CameraController;
-
-	glm::vec2 m_SupportDir;
 
 	Ref<Fizz::PhysicsObject> m_Polygon;
 	Ref<Fizz::PhysicsObject> m_Polygon2;

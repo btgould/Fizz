@@ -47,6 +47,8 @@ namespace Fizz {
 
 	uint32_t Simplex::Size() { return m_Points.size(); }
 
+	glm::vec2& Simplex::operator[](uint32_t index) { return m_Points[index]; }
+
 	Simplex::Iterator Simplex::begin() { return Iterator(&m_Points[0]); }
 
 	Simplex::Iterator Simplex::end() { return Iterator(&m_Points[0] + m_Points.size()); }

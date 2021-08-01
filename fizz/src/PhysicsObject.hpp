@@ -1,5 +1,8 @@
 #pragma once
 
+#include <glm/glm.hpp>
+#include <Nutella.hpp>
+
 namespace Fizz {
 	class PhysicsObject {
 	  public:
@@ -12,6 +15,8 @@ namespace Fizz {
 
 			return this->Support(dir) - other->Support(-dir);
 		}
+
+		bool GJKColliding(Nutella::Ref<PhysicsObject>& other);
 
 		virtual glm::vec2 GetPos() const = 0;
 		virtual void SetPos(const glm::vec2& pos) = 0;
