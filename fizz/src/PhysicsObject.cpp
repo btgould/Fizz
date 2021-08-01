@@ -3,6 +3,12 @@
 #include "Simplex.hpp"
 
 namespace Fizz {
+	// checks is simplex contains origin, returning true if it does. Otherwise, it removes any
+	// redundant points on the simplex
+	bool UpdateSimplex(Simplex& s);
+	// calculates the normal of the simplex pointed towards the origin
+	glm::vec2 NextDir(const Simplex& s);
+
 	bool PhysicsObject::GJKColliding(Nutella::Ref<PhysicsObject>& other) {
 		NT_PROFILE_FUNC();
 
@@ -13,53 +19,60 @@ namespace Fizz {
 		Simplex s({supportPoint});
 		nextDir = -supportPoint;
 
-		// add second point to simpex
+		// add second point to simplex
 		supportPoint = this->MinkowskiDiffSupport(other, nextDir);
 		if (glm::dot(nextDir, supportPoint) < 0) {
 			// simplex cannot possibly contain origin
 			return false;
 		}
 		s.Add(supportPoint);
+		nextDir = NextDir(s);
 
 		while (true) {
-			glm::vec2 C = s[0];
-			glm::vec2 B = s[1];
-
-			// caculate next direction
-			glm::vec3 BC = glm::vec3(C.x - B.x, C.y - B.y, 0.0f);
-			glm::vec3 BO = glm::vec3(-B.x, -B.y, 0.0f);
-			nextDir = glm::cross(glm::cross(BC, BO), BC);
-
-			if (nextDir == glm::vec2(0.0f, 0.0f)) {
-				// origin lies on BC (BC is guaranteed longer than BO)
-				return true;
-			}
-
-			// add point to simplex
-			glm::vec2 A = this->MinkowskiDiffSupport(other, nextDir);
-			if (glm::dot(nextDir, A) < 0) {
+			// calculate + add next point
+			supportPoint = this->MinkowskiDiffSupport(other, nextDir);
+			if (glm::dot(nextDir, supportPoint) < 0) {
 				// simplex cannot possibly contain origin
 				return false;
 			}
-			s.Add(A);
+			s.Add(supportPoint);
 
-			// calculate where origin is
-			glm::vec3 AB = glm::vec3(B.x - A.x, B.y - A.y, 0.0f);
-			glm::vec3 AC = glm::vec3(C.x - A.x, C.y - A.y, 0.0f);
-			glm::vec3 AO = glm::vec3(-A.x, -A.y, 0.0f);
-			glm::vec3 ABNorm = glm::cross(glm::cross(AC, AB), AB);
-			glm::vec3 ACNorm = glm::cross(glm::cross(AB, AC), AC);
-
-			if (glm::dot(ABNorm, AO) > 0) {
-				// origin is in region 1
-				s.Remove(C);
-			} else if (glm::dot(ACNorm, AO) > 0) {
-				// origin is in region 2
-				s.Remove(B);
-			} else {
-				// origin is in simplex -> collision
+			// check if simplex contains origin + remove redundant points
+			if (UpdateSimplex(s)) {
+				// Simplex contains origin -> collision
 				return true;
 			}
+
+			// update seach direction
+			nextDir = NextDir(s);
 		}
+	}
+
+	bool UpdateSimplex(Simplex& s) {
+		// calculate where origin is
+		glm::vec3 side1 = glm::vec3(s[1].x - s[2].x, s[1].y - s[2].y, 0.0f);
+		glm::vec3 side2 = glm::vec3(s[0].x - s[2].x, s[0].y - s[2].y, 0.0f);
+		glm::vec3 toOrigin = glm::vec3(-s[2].x, -s[2].y, 0.0f);
+		glm::vec3 norm1 = glm::cross(glm::cross(side2, side1), side1);
+		glm::vec3 norm2 = glm::cross(glm::cross(side1, side2), side2);
+
+		if (glm::dot(norm1, toOrigin) > 0) {
+			// origin is in region 1
+			s.Remove(s[0]);
+		} else if (glm::dot(norm2, toOrigin) > 0) {
+			// origin is in region 2
+			s.Remove(s[1]);
+		} else {
+			// origin is in simplex -> collision
+			return true;
+		}
+
+		return false;
+	}
+
+	glm::vec2 NextDir(const Simplex& s) {
+		glm::vec3 segment = glm::vec3(s[0].x - s[1].x, s[0].y - s[1].y, 0.0f);
+		glm::vec3 toOrigin = glm::vec3(-s[1].x, -s[1].y, 0.0f);
+		return glm::cross(glm::cross(segment, toOrigin), segment);
 	}
 } // namespace Fizz

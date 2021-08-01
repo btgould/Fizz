@@ -18,10 +18,13 @@ class FizzLayer : public Layer {
 								 (float) Application::get().getWindow().GetHeight(),
 							 true) {
 
+		// m_Polygon = CreateRef<Fizz::Polygon>(Fizz::PolygonType::SQUARE, 0.2);
+		// m_Polygon2 =
+		// 	CreateRef<Fizz::Polygon>(Fizz::PolygonType::SQUARE, 0.2, glm::vec2(1.0f, 0.0f));
+
 		m_Polygon = CreateRef<Fizz::Polygon, std::vector<glm::vec2>, glm::vec2>(
 			{{-0.25, -0.25}, {0.25, -0.25}, {0.25, 0.25}, {0, 0.5}, {-0.25, 0.25}}, {0, 0});
 
-		// m_Polygon = CreateRef<Fizz::Polygon>(Fizz::PolygonType::SQUARE, 0.2);
 		m_Polygon2 =
 			CreateRef<Fizz::Polygon>(Fizz::PolygonType::TRIANGLE, 0.3, glm::vec2(1.0f, 0.0f));
 	}

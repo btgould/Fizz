@@ -35,6 +35,7 @@ namespace Fizz {
 		uint32_t Size();
 
 		glm::vec2& operator[](uint32_t index);
+		const glm::vec2& operator[](uint32_t index) const;
 
 		Iterator begin();
 		Iterator end();
