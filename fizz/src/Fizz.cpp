@@ -23,7 +23,7 @@ class FizzLayer : public Layer {
 		// 	CreateRef<Fizz::Polygon>(Fizz::PolygonType::SQUARE, 0.2, glm::vec2(1.0f, 0.0f));
 
 		m_Polygon = CreateRef<Fizz::Polygon, std::vector<glm::vec2>, glm::vec2>(
-			{{-0.25, -0.25}, {0.25, -0.25}, {0.25, 0.25}, {0, 0.5}, {-0.25, 0.25}}, {0, 0});
+			{{-0.25, -0.25}, {0.25, -0.25}, {0.25, 0.25}, {0, 0.5}, {-0.25, 0.25}}, {0.2, -0.28});
 
 		m_Polygon2 =
 			CreateRef<Fizz::Polygon>(Fizz::PolygonType::TRIANGLE, 0.3, glm::vec2(1.0f, 0.0f));
@@ -71,8 +71,11 @@ class FizzLayer : public Layer {
 
 		ImGui::Separator();
 
+		glm::vec2 separationDist = m_Polygon->GJKDistance(m_Polygon2);
+
 		ImGui::Text("Collision");
 		ImGui::Text("Colliding: %s", m_Polygon->GJKColliding(m_Polygon2) ? "true" : "false");
+		ImGui::Text("Distance: <%0.3f, %0.3f>", separationDist.x, separationDist.y);
 
 		ImGui::End();
 	}

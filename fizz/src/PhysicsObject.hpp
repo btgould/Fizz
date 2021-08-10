@@ -17,6 +17,8 @@ namespace Fizz {
 		}
 
 		bool GJKColliding(Nutella::Ref<PhysicsObject>& other);
+		glm::vec2 GJKDistance(Nutella::Ref<PhysicsObject>& other,
+							  float tolerance = glm::pow(10, -8));
 
 		virtual glm::vec2 GetPos() const = 0;
 		virtual void SetPos(const glm::vec2& pos) = 0;

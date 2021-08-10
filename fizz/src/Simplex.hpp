@@ -32,7 +32,7 @@ namespace Fizz {
 		void Add(const glm::vec2& point);
 		void Remove(const glm::vec2& point);
 
-		uint32_t Size();
+		uint32_t Size() const;
 
 		glm::vec2& operator[](uint32_t index);
 		const glm::vec2& operator[](uint32_t index) const;

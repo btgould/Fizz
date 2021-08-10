@@ -45,7 +45,7 @@ namespace Fizz {
 		}
 	}
 
-	uint32_t Simplex::Size() { return m_Points.size(); }
+	uint32_t Simplex::Size() const { return m_Points.size(); }
 
 	glm::vec2& Simplex::operator[](uint32_t index) { return m_Points[index]; }
 	const glm::vec2& Simplex::operator[](uint32_t index) const { return m_Points[index]; }
