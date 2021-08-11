@@ -34,7 +34,11 @@ namespace Fizz {
 
 	Simplex::~Simplex() {}
 
-	void Simplex::Add(const glm::vec2& point) { m_Points.emplace_back(point); }
+	void Simplex::Add(const glm::vec2& point) { m_Points.push_back(point); }
+
+	void Simplex::Add(const glm::vec2& point, uint32_t idx) {
+		m_Points.insert(m_Points.begin() + idx, point);
+	}
 
 	void Simplex::Remove(const glm::vec2& point) {
 		for (int i = 0; i < m_Points.size(); i++) {

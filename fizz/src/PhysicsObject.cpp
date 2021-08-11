@@ -3,24 +3,24 @@
 #include "Simplex.hpp"
 
 namespace Fizz {
-	// checks is simplex contains origin, returning true if it does. Otherwise, it removes any
+	// checks is simplex contains origin, returning true if it does. p2wise, it removes any
 	// redundant points on the simplex
 	bool UpdateSimplex(Simplex& s);
 	// calculates the normal of the simplex pointed towards the origin
 	glm::vec2 NextDir(const Simplex& s);
 
-	bool PhysicsObject::GJKColliding(Nutella::Ref<PhysicsObject>& other) {
+	bool GJKColliding(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2) {
 		NT_PROFILE_FUNC();
 
-		glm::vec2 nextDir = other->GetPos() - this->GetPos();
+		glm::vec2 nextDir = p2->GetPos() - p1->GetPos();
 
 		// add first point to simplex
-		glm::vec2 supportPoint(this->MinkowskiDiffSupport(other, nextDir));
+		glm::vec2 supportPoint(p1->MinkowskiDiffSupport(p2, nextDir));
 		Simplex s({supportPoint});
 		nextDir = -supportPoint;
 
 		// add second point to simplex
-		supportPoint = this->MinkowskiDiffSupport(other, nextDir);
+		supportPoint = p1->MinkowskiDiffSupport(p2, nextDir);
 		if (glm::dot(nextDir, supportPoint) < 0) {
 			// simplex cannot possibly contain origin
 			return false;
@@ -30,7 +30,7 @@ namespace Fizz {
 
 		while (true) {
 			// calculate + add next point
-			supportPoint = this->MinkowskiDiffSupport(other, nextDir);
+			supportPoint = p1->MinkowskiDiffSupport(p2, nextDir);
 			if (glm::dot(nextDir, supportPoint) < 0) {
 				// simplex cannot possibly contain origin
 				return false;
@@ -82,19 +82,19 @@ namespace Fizz {
 	// the redundant point from the simplex
 	glm::vec2 Triangle(Simplex& s);
 
-	glm::vec2 PhysicsObject::GJKDistance(Nutella::Ref<PhysicsObject>& other,
-										 float tolerance /*= 10^-8*/) {
+	glm::vec2 GJKDistance(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2,
+						  float tolerance /* = glm::pow(10, -8)*/) {
 		NT_PROFILE_FUNC();
 
-		glm::vec2 nextDir = other->GetPos() - this->GetPos();
+		glm::vec2 nextDir = p2->GetPos() - p1->GetPos();
 
-		Simplex s({this->MinkowskiDiffSupport(other, nextDir)});
-		s.Add(this->MinkowskiDiffSupport(other, -nextDir));
+		Simplex s({p1->MinkowskiDiffSupport(p2, nextDir)});
+		s.Add(p1->MinkowskiDiffSupport(p2, -nextDir));
 
 		nextDir = -Line(s);
 
 		while (true) {
-			s.Add(this->MinkowskiDiffSupport(other, nextDir));
+			s.Add(p1->MinkowskiDiffSupport(p2, nextDir));
 
 			// check if we are no longer making significant progress
 			float newSupportProj = glm::dot(nextDir, s[2]);
@@ -119,7 +119,7 @@ namespace Fizz {
 
 		// AB * AO =  length of projection of AO onto AB times length of AB
 		// AB * AB = length of AB^2
-		// therefore, t = length of AB component of AO
+		// therefore, t = length of AB component of AO as a fraction of length of AB
 		float t = glm::dot(AB, AO) / glm::dot(AB, AB);
 		t = glm::clamp(t, 0.0f, 1.0f); // we can only go so far in each direction
 
@@ -165,7 +165,7 @@ namespace Fizz {
 			return Line(s);
 		}
 
-		// otherwise, origin is in simplex -> collision
+		// p2wise, origin is in simplex -> collision
 		return glm::vec2(0.0f, 0.0f);
 	}
 } // namespace Fizz

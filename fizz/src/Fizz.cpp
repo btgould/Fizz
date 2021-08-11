@@ -71,10 +71,10 @@ class FizzLayer : public Layer {
 
 		ImGui::Separator();
 
-		glm::vec2 separationDist = m_Polygon->GJKDistance(m_Polygon2);
+		glm::vec2 separationDist = GJKDistance(m_Polygon, m_Polygon2);
 
 		ImGui::Text("Collision");
-		ImGui::Text("Colliding: %s", m_Polygon->GJKColliding(m_Polygon2) ? "true" : "false");
+		ImGui::Text("Colliding: %s", GJKColliding(m_Polygon, m_Polygon2) ? "true" : "false");
 		ImGui::Text("Distance: <%0.3f, %0.3f>", separationDist.x, separationDist.y);
 
 		ImGui::End();

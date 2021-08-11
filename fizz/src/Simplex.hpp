@@ -30,6 +30,7 @@ namespace Fizz {
 		~Simplex();
 
 		void Add(const glm::vec2& point);
+		void Add(const glm::vec2& point, uint32_t idx);
 		void Remove(const glm::vec2& point);
 
 		uint32_t Size() const;
