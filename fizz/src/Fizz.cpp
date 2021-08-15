@@ -18,12 +18,16 @@ class FizzLayer : public Layer {
 								 (float) Application::get().getWindow().GetHeight(),
 							 true) {
 
-		// m_Polygon = CreateRef<Fizz::Polygon>(Fizz::PolygonType::SQUARE, 0.2);
+		// m_Polygon = CreateRef<Fizz::Polygon>(Fizz::PolygonType::SQUARE, 0.2, glm::vec2(0.6f,
+		// 0.1f));
+
 		// m_Polygon2 =
 		// 	CreateRef<Fizz::Polygon>(Fizz::PolygonType::SQUARE, 0.2, glm::vec2(1.0f, 0.0f));
 
-		m_Polygon = CreateRef<Fizz::Polygon, std::vector<glm::vec2>, glm::vec2>(
-			{{-0.25, -0.25}, {0.25, -0.25}, {0.25, 0.25}, {0, 0.5}, {-0.25, 0.25}}, {0.2, -0.28});
+		m_Polygon = CreateRef<Fizz::Polygon>(
+			std::vector<glm::vec2>(
+				{{-0.25, -0.25}, {0.25, -0.25}, {0.25, 0.25}, {0, 0.5}, {-0.25, 0.25}}),
+			glm::vec2(0.2, -0.28));
 
 		m_Polygon2 =
 			CreateRef<Fizz::Polygon>(Fizz::PolygonType::TRIANGLE, 0.3, glm::vec2(1.0f, 0.0f));
@@ -71,11 +75,19 @@ class FizzLayer : public Layer {
 
 		ImGui::Separator();
 
-		glm::vec2 separationDist = GJKDistance(m_Polygon, m_Polygon2);
+		Fizz::Collision collision = Fizz::GJKGetCollision(m_Polygon, m_Polygon2);
 
 		ImGui::Text("Collision");
-		ImGui::Text("Colliding: %s", GJKColliding(m_Polygon, m_Polygon2) ? "true" : "false");
-		ImGui::Text("Distance: <%0.3f, %0.3f>", separationDist.x, separationDist.y);
+		if (collision.exists) {
+			ImGui::Text("Colliding: true");
+			ImGui::Text("Penetration Depth: %.3f", collision.penetrationDist);
+			ImGui::Text("Min. Translation Vector: <%.3f, %.3f>", collision.MTV.x, collision.MTV.y);
+		} else {
+			glm::vec2 dist = Fizz::GJKDistance(m_Polygon, m_Polygon2);
+
+			ImGui::Text("Colliding: false");
+			ImGui::Text("Distance: <%.3f, %.3f>", dist.x, dist.y);
+		}
 
 		ImGui::End();
 	}

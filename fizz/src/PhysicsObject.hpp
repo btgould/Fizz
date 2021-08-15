@@ -33,6 +33,8 @@ namespace Fizz {
 		float penetrationDist;
 		glm::vec2 MTV;
 
+		// factory constructor to create an object representing no collision between two physics
+		// bodies
 		static Collision None(Nutella::Ref<PhysicsObject> collider,
 							  Nutella::Ref<PhysicsObject> collided) {
 			return {collider, collided, false, 0.0f, glm::vec2(0.0f, 0.0f)};
@@ -41,5 +43,7 @@ namespace Fizz {
 
 	bool GJKColliding(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2);
 	glm::vec2 GJKDistance(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2,
-						  float tolerance = glm::pow(10, -8));
+						  float tolerance = glm::pow(10, -5));
+	Collision GJKGetCollision(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2,
+							  float tolerance = glm::pow(10, -5));
 } // namespace Fizz

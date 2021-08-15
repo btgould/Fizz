@@ -73,7 +73,15 @@ namespace Fizz {
 	glm::vec2 NextDir(const Simplex& s) {
 		glm::vec3 segment = glm::vec3(s[0].x - s[1].x, s[0].y - s[1].y, 0.0f);
 		glm::vec3 toOrigin = glm::vec3(-s[1].x, -s[1].y, 0.0f);
-		return glm::cross(glm::cross(segment, toOrigin), segment);
+
+		glm::vec2 dir = glm::cross(glm::cross(segment, toOrigin), segment);
+
+		if (dir == glm::vec2(0.0f, 0.0f)) {
+			// origin is on line segment -> search along normal
+			dir = glm::vec2(-segment.y, segment.x);
+		}
+
+		return dir;
 	}
 
 	// Finds the closest point to the origin on the line segment defined by two points
@@ -167,5 +175,115 @@ namespace Fizz {
 
 		// p2wise, origin is in simplex -> collision
 		return glm::vec2(0.0f, 0.0f);
+	}
+
+	// Finds the closest point on the edge of the Minkowski difference to the origin, and returns
+	// the collision this point describes.
+	Collision EPA(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2, Simplex& s,
+				  float tolerance);
+
+	Collision GJKGetCollision(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2,
+							  float tolerance /* = glm::pow(10, -4)*/) {
+		NT_PROFILE_FUNC();
+
+		glm::vec2 nextDir = p2->GetPos() - p1->GetPos();
+
+		// add first point to simplex
+		glm::vec2 supportPoint(p1->MinkowskiDiffSupport(p2, nextDir));
+		Simplex s({supportPoint});
+		nextDir = -supportPoint;
+
+		// add second point to simplex
+		supportPoint = p1->MinkowskiDiffSupport(p2, nextDir);
+		if (glm::dot(nextDir, supportPoint) < 0) {
+			// simplex cannot possibly contain origin
+			return Collision::None(p1, p2);
+		}
+		s.Add(supportPoint);
+		nextDir = NextDir(s);
+
+		while (true) {
+			// calculate + add next point
+			supportPoint = p1->MinkowskiDiffSupport(p2, nextDir);
+			if (glm::dot(nextDir, supportPoint) < 0) {
+				// simplex cannot possibly contain origin
+				return Collision::None(p1, p2);
+			}
+			s.Add(supportPoint);
+
+			// check if simplex contains origin + remove redundant points
+			if (UpdateSimplex(s)) {
+				// Simplex contains origin -> collision
+				break;
+			}
+
+			// update seach direction
+			nextDir = NextDir(s);
+		}
+
+		// compute + return collision
+		return EPA(p1, p2, s, tolerance);
+	}
+
+	Collision EPA(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2, Simplex& s,
+				  float tolerance) {
+		while (true) {
+			float closestDist = glm::dot(s[0], s[0]);
+			glm::vec2 closestDir(s[0]);
+			uint32_t closestIdx = 1;
+
+			// calculate closest point on current simplex
+			for (uint32_t i = 0; i < s.Size(); i++) {
+				uint32_t j = i + 1 == s.Size() ? 0 : i + 1;
+
+				glm::vec2 p = Line(Simplex({s[i], s[j]}));
+				float newDist = glm::dot(p, p);
+
+				if (newDist < closestDist) {
+					closestDist = newDist;
+					closestDir = p;
+					closestIdx = i + 1;
+				}
+			}
+
+			// calculate next point to add to simplex
+			if (closestDist < glm::pow(10, -8)) {
+				// origin is on edge of simplex -> need to search along edge normals
+				glm::vec2 edge = s[closestIdx % s.Size()] - s[closestIdx - 1];
+				glm::vec2 norm(-edge.y, edge.x);
+
+				// make sure we are searching away from rest of simplex
+				if (glm::dot(norm, s[(closestIdx + 1) % s.Size()]) > 0) {
+					norm = -norm;
+				}
+
+				closestDir = norm;
+			}
+
+			glm::vec2 nextPoint = p1->MinkowskiDiffSupport(p2, closestDir);
+
+			// check if we are still making significant progress
+			float oldDist = closestDist;
+			float newDist = glm::dot(nextPoint, closestDir);
+
+			if (newDist - oldDist < tolerance) {
+				float penetrationDepth;
+				glm::vec2 MTV;
+
+				if (closestDist < glm::pow(10, -8)) {
+					// origin is on edge of simplex
+					penetrationDepth = 0.0f;
+					MTV = glm::normalize(closestDir);
+				} else {
+					// orgin is properly inside simplex
+					penetrationDepth = glm::length(closestDir);
+					MTV = closestDir / penetrationDepth;
+				}
+
+				return {p1, p2, true, penetrationDepth, MTV};
+			} else {
+				s.Add(nextPoint, closestIdx);
+			}
+		}
 	}
 } // namespace Fizz
