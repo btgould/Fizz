@@ -7,6 +7,7 @@
 
 #include "Polygon.hpp"
 #include "Simplex.hpp"
+#include "PhysicsEnvironment.hpp"
 
 using namespace Nutella;
 using namespace Fizz;
@@ -19,27 +20,22 @@ class FizzLayer : public Layer {
 								 (float) Application::get().getWindow().GetHeight(),
 							 true) {
 
-		// m_PhysicsObjects.push_back(
-		// 	CreateRef<Polygon>(PolygonType::SQUARE, 0.2, glm::vec2(0.6f, 0.1f)));
-
-		// m_PhysicsObjects.push_back(
-		// 	CreateRef<Polygon>(PolygonType::SQUARE, 0.2, glm::vec2(1.0f, 0.0f)));
-
-		m_PhysicsObjects.push_back(CreateRef<Polygon>(
+		m_PhysicsEnv.Add(CreateRef<Polygon>(PolygonType::TRIANGLE, 0.3, glm::vec2(1.0f, 0.0f)));
+		m_PhysicsEnv.Add(CreateRef<Polygon>(PolygonType::SQUARE, 0.2, glm::vec2(-0.2f, 0.5f)));
+		m_PhysicsEnv.Add(CreateRef<Polygon>(PolygonType::HEXAGON, 0.2, glm::vec2(0.8f, -0.3f)));
+		m_PhysicsEnv.Add(CreateRef<Polygon>(
 			std::vector<glm::vec2>(
 				{{-0.25, -0.25}, {0.25, -0.25}, {0.25, 0.25}, {0, 0.5}, {-0.25, 0.25}}),
-			glm::vec2(0.2, -0.28)));
-
-		m_PhysicsObjects.push_back(
-			CreateRef<Polygon>(PolygonType::TRIANGLE, 0.3, glm::vec2(1.0f, 0.0f)));
+			glm::vec2(0.0f, -0.3f)));
 	}
 
 	virtual void OnUpdate(Timestep ts) override {
 		m_CameraController.OnUpdate(ts);
 
+		m_PhysicsEnv.Update();
+
 		Renderer::BeginScene(m_CameraController.GetCamera());
-		for (Ref<PhysicsObject>& object : m_PhysicsObjects)
-			object->Render();
+		m_PhysicsEnv.Render();
 		Renderer::EndScene();
 	}
 
@@ -48,20 +44,7 @@ class FizzLayer : public Layer {
 
 		ImGuiShowPhysicsObjects();
 		ImGui::Separator();
-
-		Collision collision = GJKGetCollision(m_PhysicsObjects[0], m_PhysicsObjects[1]);
-
-		ImGui::Text("Collision");
-		if (collision.exists) {
-			ImGui::Text("Colliding: true");
-			ImGui::Text("Penetration Depth: %.3f", collision.penetrationDist);
-			ImGui::Text("Min. Translation Vector: <%.3f, %.3f>", collision.MTV.x, collision.MTV.y);
-		} else {
-			glm::vec2 dist = GJKDistance(m_PhysicsObjects[0], m_PhysicsObjects[1]);
-
-			ImGui::Text("Colliding: false");
-			ImGui::Text("Distance: <%.3f, %.3f>", dist.x, dist.y);
-		}
+		ImGuiShowCollisions();
 
 		ImGui::End();
 	}
@@ -70,8 +53,8 @@ class FizzLayer : public Layer {
 
   private:
 	void ImGuiShowPhysicsObjects() {
-		for (uint32_t i = 0; i < m_PhysicsObjects.size(); i++) {
-			Ref<PhysicsObject>& object = m_PhysicsObjects[i];
+		for (uint32_t i = 0; i < m_PhysicsEnv.GetObjects().size(); i++) {
+			Ref<PhysicsObject>& object = m_PhysicsEnv.GetObjects()[i];
 
 			glm::vec2 localPos = object->GetPos();
 			float localRot = object->GetRot();
@@ -88,10 +71,29 @@ class FizzLayer : public Layer {
 		}
 	}
 
+	void ImGuiShowCollisions() {
+		std::vector<Collision>& collisions = m_PhysicsEnv.GetCollisions();
+
+		ImGui::Text("Collisions");
+		if (collisions.size() == 0) {
+			ImGui::Text("None");
+		} else {
+			for (uint32_t i = 0; i < collisions.size(); i++) {
+				Collision collision = collisions[i];
+
+				ImGui::PushID(i);
+				ImGui::Text("Collision %d: ", i + 1);
+				ImGui::Text("Penetration Depth: %.3f", collision.penetrationDist);
+				ImGui::Text("Min. Translation Vector: <%.3f, %.3f>", collision.MTV.x,
+							collision.MTV.y);
+				ImGui::PopID();
+			}
+		}
+	}
+
   private:
 	OrthoCamController m_CameraController;
-
-	std::vector<Ref<PhysicsObject>> m_PhysicsObjects;
+	PhysicsEnvironment m_PhysicsEnv;
 };
 
 class Sandbox : public Application {

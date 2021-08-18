@@ -187,6 +187,9 @@ namespace Fizz {
 		NT_PROFILE_FUNC();
 
 		glm::vec2 nextDir = p2->GetPos() - p1->GetPos();
+		if (nextDir == glm::vec2(0.0f, 0.0f)) {
+			nextDir = glm::vec2(1.0f, 0.0f);
+		}
 
 		// add first point to simplex
 		glm::vec2 supportPoint(p1->MinkowskiDiffSupport(p2, nextDir));
