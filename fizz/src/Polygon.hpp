@@ -43,6 +43,14 @@ namespace Fizz {
 			UpdatePoints();
 		}
 
+		inline virtual void SetTRS(const glm::vec2& pos, const float rot,
+								   const glm::vec2& scale) override {
+			m_Position = pos;
+			m_Rotation = rot;
+			m_Scale = scale;
+			UpdatePoints();
+		}
+
 	  private:
 		void UpdateTRSMat();
 		void UpdatePoints();

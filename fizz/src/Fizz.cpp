@@ -9,6 +9,7 @@
 #include "Simplex.hpp"
 
 using namespace Nutella;
+using namespace Fizz;
 
 class FizzLayer : public Layer {
   public:
@@ -18,64 +19,37 @@ class FizzLayer : public Layer {
 								 (float) Application::get().getWindow().GetHeight(),
 							 true) {
 
-		// m_Polygon = CreateRef<Fizz::Polygon>(Fizz::PolygonType::SQUARE, 0.2, glm::vec2(0.6f,
-		// 0.1f));
+		// m_PhysicsObjects.push_back(
+		// 	CreateRef<Polygon>(PolygonType::SQUARE, 0.2, glm::vec2(0.6f, 0.1f)));
 
-		// m_Polygon2 =
-		// 	CreateRef<Fizz::Polygon>(Fizz::PolygonType::SQUARE, 0.2, glm::vec2(1.0f, 0.0f));
+		// m_PhysicsObjects.push_back(
+		// 	CreateRef<Polygon>(PolygonType::SQUARE, 0.2, glm::vec2(1.0f, 0.0f)));
 
-		m_Polygon = CreateRef<Fizz::Polygon>(
+		m_PhysicsObjects.push_back(CreateRef<Polygon>(
 			std::vector<glm::vec2>(
 				{{-0.25, -0.25}, {0.25, -0.25}, {0.25, 0.25}, {0, 0.5}, {-0.25, 0.25}}),
-			glm::vec2(0.2, -0.28));
+			glm::vec2(0.2, -0.28)));
 
-		m_Polygon2 =
-			CreateRef<Fizz::Polygon>(Fizz::PolygonType::TRIANGLE, 0.3, glm::vec2(1.0f, 0.0f));
+		m_PhysicsObjects.push_back(
+			CreateRef<Polygon>(PolygonType::TRIANGLE, 0.3, glm::vec2(1.0f, 0.0f)));
 	}
 
 	virtual void OnUpdate(Timestep ts) override {
 		m_CameraController.OnUpdate(ts);
 
 		Renderer::BeginScene(m_CameraController.GetCamera());
-		m_Polygon->Render();
-		m_Polygon2->Render();
+		for (Ref<PhysicsObject>& object : m_PhysicsObjects)
+			object->Render();
 		Renderer::EndScene();
 	}
 
 	virtual void OnImGuiRender() override {
 		ImGui::Begin("Fizziks Debug");
 
-		glm::vec2 p1LocalPos = m_Polygon->GetPos();
-		float p1LocalRot = m_Polygon->GetRot();
-		glm::vec2 p1LocalScale = m_Polygon->GetScale();
-
-		ImGui::Text("Polygon 1:");
-		ImGui::SliderFloat2("Position##1", glm::value_ptr(p1LocalPos), -2.0f, 2.0f);
-		ImGui::SliderFloat("Rotation##1", &p1LocalRot, 0.0f, 2 * 3.1415f);
-		ImGui::SliderFloat2("Scale##1", glm::value_ptr(p1LocalScale), 0.0f, 2.0f);
-
-		m_Polygon->SetPos(p1LocalPos);
-		m_Polygon->SetRot(p1LocalRot);
-		m_Polygon->SetScale(p1LocalScale);
-
+		ImGuiShowPhysicsObjects();
 		ImGui::Separator();
 
-		glm::vec2 p2LocalPos = m_Polygon2->GetPos();
-		float p2LocalRot = m_Polygon2->GetRot();
-		glm::vec2 p2LocalScale = m_Polygon2->GetScale();
-
-		ImGui::Text("Polygon 2:");
-		ImGui::SliderFloat2("Position##2", glm::value_ptr(p2LocalPos), -2.0f, 2.0f);
-		ImGui::SliderFloat("Rotation##2", &p2LocalRot, 0.0f, 2 * 3.1415f);
-		ImGui::SliderFloat2("Scale##2", glm::value_ptr(p2LocalScale), 0.0f, 2.0f);
-
-		m_Polygon2->SetPos(p2LocalPos);
-		m_Polygon2->SetRot(p2LocalRot);
-		m_Polygon2->SetScale(p2LocalScale);
-
-		ImGui::Separator();
-
-		Fizz::Collision collision = Fizz::GJKGetCollision(m_Polygon, m_Polygon2);
+		Collision collision = GJKGetCollision(m_PhysicsObjects[0], m_PhysicsObjects[1]);
 
 		ImGui::Text("Collision");
 		if (collision.exists) {
@@ -83,7 +57,7 @@ class FizzLayer : public Layer {
 			ImGui::Text("Penetration Depth: %.3f", collision.penetrationDist);
 			ImGui::Text("Min. Translation Vector: <%.3f, %.3f>", collision.MTV.x, collision.MTV.y);
 		} else {
-			glm::vec2 dist = Fizz::GJKDistance(m_Polygon, m_Polygon2);
+			glm::vec2 dist = GJKDistance(m_PhysicsObjects[0], m_PhysicsObjects[1]);
 
 			ImGui::Text("Colliding: false");
 			ImGui::Text("Distance: <%.3f, %.3f>", dist.x, dist.y);
@@ -95,10 +69,29 @@ class FizzLayer : public Layer {
 	virtual void OnEvent(Event& event) override { m_CameraController.OnEvent(event); }
 
   private:
+	void ImGuiShowPhysicsObjects() {
+		for (uint32_t i = 0; i < m_PhysicsObjects.size(); i++) {
+			Ref<PhysicsObject>& object = m_PhysicsObjects[i];
+
+			glm::vec2 localPos = object->GetPos();
+			float localRot = object->GetRot();
+			glm::vec2 localScale = object->GetScale();
+
+			ImGui::PushID(i);
+			ImGui::Text("Polygon %u:", i + 1);
+			ImGui::SliderFloat2("Position", glm::value_ptr(localPos), -2.0f, 2.0f);
+			ImGui::SliderFloat("Rotation", &localRot, 0.0f, 2 * 3.1415f);
+			ImGui::SliderFloat2("Scale", glm::value_ptr(localScale), 0.0f, 2.0f);
+			ImGui::PopID();
+
+			object->SetTRS(localPos, localRot, localScale);
+		}
+	}
+
+  private:
 	OrthoCamController m_CameraController;
 
-	Ref<Fizz::PhysicsObject> m_Polygon;
-	Ref<Fizz::PhysicsObject> m_Polygon2;
+	std::vector<Ref<PhysicsObject>> m_PhysicsObjects;
 };
 
 class Sandbox : public Application {

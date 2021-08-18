@@ -25,6 +25,7 @@ namespace Fizz {
 		virtual void SetRot(const float rot) = 0;
 		virtual glm::vec2 GetScale() const = 0;
 		virtual void SetScale(const glm::vec2& scale) = 0;
+		virtual void SetTRS(const glm::vec2& pos, const float rot, const glm::vec2& scale) = 0;
 	};
 
 	struct Collision {
