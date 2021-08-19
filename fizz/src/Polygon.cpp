@@ -8,7 +8,8 @@ namespace Fizz {
 
 	Polygon::Polygon(const std::vector<glm::vec2>& points, const glm::vec2& pos /*= {0.0, 0.0}*/)
 		: m_Points(points), m_NumPoints(points.size()), m_Position(pos), m_Rotation(0.0f),
-		  m_Scale(1.0f, 1.0f), m_Shader(Shader::Create("fizz/res/shaders/Mesh.shader")) {
+		  m_Scale(1.0f, 1.0f), m_Velocity(0.0f, 0.0f), m_InvMass(1.0f), m_Restitution(0.8f),
+		  m_Shader(Shader::Create("fizz/res/shaders/Mesh.shader")) {
 		// use point data to create a Vertex Array
 		VertexBufferLayout layout;
 		layout.push(VertexAttribType::FLOAT, 2, false); // position
@@ -33,7 +34,8 @@ namespace Fizz {
 	}
 
 	Polygon::Polygon(PolygonType type, float size, const glm::vec2& pos)
-		: m_Position(pos), m_Rotation(0.0f), m_Scale(size, size),
+		: m_Position(pos), m_Rotation(0.0f), m_Scale(size, size), m_Velocity(0.0f, 0.0f),
+		  m_InvMass(1.0f), m_Restitution(0.8f),
 		  m_Shader(Shader::Create("fizz/res/shaders/Mesh.shader")) {
 		std::vector<uint32_t> vertexOrder;
 
@@ -82,6 +84,13 @@ namespace Fizz {
 	Polygon::~Polygon() {}
 
 	void Polygon::Render() { Renderer::Submit(m_VAO, m_Shader, m_TRSMat); }
+
+	void Polygon::Update() {
+		NT_PROFILE_FUNC();
+
+		m_Position += m_Velocity;
+		UpdatePoints();
+	}
 
 	glm::vec2 Polygon::Support(const glm::vec2& dir) const {
 		NT_PROFILE_FUNC();

@@ -22,6 +22,7 @@ namespace Fizz {
 		~Polygon();
 
 		virtual void Render() override;
+		virtual void Update() override;
 
 		virtual glm::vec2 Support(const glm::vec2& dir) const override;
 
@@ -51,6 +52,18 @@ namespace Fizz {
 			UpdatePoints();
 		}
 
+		inline virtual const glm::vec2& GetVelocity() const override { return m_Velocity; }
+		inline virtual void ApplyImpulse(const glm::vec2& impulse) override {
+			m_Velocity += impulse;
+		}
+
+		inline virtual float GetInvMass() const override { return m_InvMass; }
+		inline virtual void SetInvMass(float invMass) override { m_InvMass = invMass; }
+		inline virtual float GetRestitution() const override { return m_Restitution; }
+		inline virtual void SetRestitution(float restitution) override {
+			m_Restitution = restitution;
+		}
+
 	  private:
 		void UpdateTRSMat();
 		void UpdatePoints();
@@ -63,8 +76,12 @@ namespace Fizz {
 		glm::vec2 m_Position;
 		float m_Rotation;
 		glm::vec2 m_Scale;
-
 		glm::mat4 m_TRSMat;
+
+		glm::vec2 m_Velocity;
+
+		float m_InvMass;
+		float m_Restitution;
 
 		Nutella::Ref<Nutella::VertexArray> m_VAO;
 		Nutella::Ref<Nutella::Shader> m_Shader;

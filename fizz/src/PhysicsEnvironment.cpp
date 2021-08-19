@@ -1,5 +1,7 @@
 #include "PhysicsEnvironment.hpp"
 
+#include "CollisionResolution.hpp"
+
 using namespace Nutella;
 using namespace Fizz;
 
@@ -17,7 +19,10 @@ namespace Fizz {
 			object->Render();
 	}
 
-	void PhysicsEnvironment::UpdateObjects() {}
+	void PhysicsEnvironment::UpdateObjects() {
+		for (Ref<PhysicsObject>& object : m_Objects)
+			object->Update();
+	}
 
 	void PhysicsEnvironment::FindCollisions() {
 		// TODO: implement some sort of broad phase collision detection
@@ -36,5 +41,10 @@ namespace Fizz {
 		}
 	}
 
-	void PhysicsEnvironment::ResolveCollisions() {}
+	void PhysicsEnvironment::ResolveCollisions() {
+		NT_PROFILE_FUNC();
+
+		for (Collision collision : m_Collisions)
+			ResolveCollision(collision);
+	}
 } // namespace Fizz

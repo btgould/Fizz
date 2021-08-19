@@ -10,6 +10,7 @@ namespace Fizz {
 	class PhysicsObject {
 	  public:
 		virtual void Render() = 0;
+		virtual void Update() = 0;
 
 		virtual glm::vec2 Support(const glm::vec2& dir) const = 0;
 		inline glm::vec2 MinkowskiDiffSupport(Nutella::Ref<PhysicsObject>& other,
@@ -26,6 +27,14 @@ namespace Fizz {
 		virtual glm::vec2 GetScale() const = 0;
 		virtual void SetScale(const glm::vec2& scale) = 0;
 		virtual void SetTRS(const glm::vec2& pos, const float rot, const glm::vec2& scale) = 0;
+
+		virtual const glm::vec2& GetVelocity() const = 0;
+		virtual void ApplyImpulse(const glm::vec2& impulse) = 0;
+
+		virtual float GetInvMass() const = 0;
+		virtual void SetInvMass(float invMass) = 0;
+		virtual float GetRestitution() const = 0;
+		virtual void SetRestitution(float restitution) = 0;
 	};
 
 	struct Collision {

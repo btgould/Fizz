@@ -20,13 +20,23 @@ class FizzLayer : public Layer {
 								 (float) Application::get().getWindow().GetHeight(),
 							 true) {
 
-		m_PhysicsEnv.Add(CreateRef<Polygon>(PolygonType::TRIANGLE, 0.3, glm::vec2(1.0f, 0.0f)));
-		m_PhysicsEnv.Add(CreateRef<Polygon>(PolygonType::SQUARE, 0.2, glm::vec2(-0.2f, 0.5f)));
-		m_PhysicsEnv.Add(CreateRef<Polygon>(PolygonType::HEXAGON, 0.2, glm::vec2(0.8f, -0.3f)));
-		m_PhysicsEnv.Add(CreateRef<Polygon>(
-			std::vector<glm::vec2>(
-				{{-0.25, -0.25}, {0.25, -0.25}, {0.25, 0.25}, {0, 0.5}, {-0.25, 0.25}}),
-			glm::vec2(0.0f, -0.3f)));
+		Ref<PhysicsObject> moved =
+			CreateRef<Polygon>(PolygonType::SQUARE, 0.2, glm::vec2(-0.5f, 0.0f));
+		moved->ApplyImpulse(glm::vec2(0.01f, 0.0f));
+
+		Ref<PhysicsObject> wallRight =
+			CreateRef<Polygon>(PolygonType::SQUARE, 0.3, glm::vec2(1.0f, 0.0f));
+		wallRight->SetScale(glm::vec2(0.2f, 1.0f));
+		wallRight->SetInvMass(0.0f);
+
+		Ref<PhysicsObject> wallLeft =
+			CreateRef<Polygon>(PolygonType::SQUARE, 0.3, glm::vec2(-1.0f, 0.0f));
+		wallLeft->SetScale(glm::vec2(0.2f, 1.0f));
+		wallLeft->SetInvMass(0.0f);
+
+		m_PhysicsEnv.Add(moved);
+		m_PhysicsEnv.Add(wallRight);
+		m_PhysicsEnv.Add(wallLeft);
 	}
 
 	virtual void OnUpdate(Timestep ts) override {

@@ -76,11 +76,13 @@ endif
 GENERATED :=
 OBJECTS :=
 
+GENERATED += $(OBJDIR)/CollisionResolution.o
 GENERATED += $(OBJDIR)/Fizz.o
 GENERATED += $(OBJDIR)/PhysicsEnvironment.o
 GENERATED += $(OBJDIR)/PhysicsObject.o
 GENERATED += $(OBJDIR)/Polygon.o
 GENERATED += $(OBJDIR)/Simplex.o
+OBJECTS += $(OBJDIR)/CollisionResolution.o
 OBJECTS += $(OBJDIR)/Fizz.o
 OBJECTS += $(OBJDIR)/PhysicsEnvironment.o
 OBJECTS += $(OBJDIR)/PhysicsObject.o
@@ -149,6 +151,9 @@ endif
 # File Rules
 # #############################################
 
+$(OBJDIR)/CollisionResolution.o: src/CollisionResolution.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Fizz.o: src/Fizz.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
