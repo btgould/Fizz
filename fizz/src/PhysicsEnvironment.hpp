@@ -1,6 +1,7 @@
 #pragma once
 
-#include "PhysicsObject.hpp"
+#include "Objects/PhysicsObject.hpp"
+#include "Collisions/CollisionDetection.hpp"
 
 namespace Fizz {
 	class PhysicsEnvironment {

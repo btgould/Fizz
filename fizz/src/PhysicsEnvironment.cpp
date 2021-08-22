@@ -1,6 +1,6 @@
 #include "PhysicsEnvironment.hpp"
 
-#include "CollisionResolution.hpp"
+#include "Collisions/CollisionResolution.hpp"
 
 using namespace Nutella;
 using namespace Fizz;

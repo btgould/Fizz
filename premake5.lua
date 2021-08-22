@@ -33,6 +33,7 @@ project "Fizz"
     }
 
     includedirs {
+        "%{prj.location}/src",
         "nutella/nutella/src",
         "nutella/nutella/vendor/spdlog/include",
         "%{IncludeDir.ImGui}",

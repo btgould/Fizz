@@ -19,7 +19,7 @@ endif
 # #############################################
 
 RESCOMP = windres
-INCLUDES += -I../nutella/nutella/src -I../nutella/nutella/vendor/spdlog/include -I../nutella/nutella/vendor/imgui -I../nutella/nutella/vendor/glm
+INCLUDES += -Isrc -I../nutella/nutella/src -I../nutella/nutella/vendor/spdlog/include -I../nutella/nutella/vendor/imgui -I../nutella/nutella/vendor/glm
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
@@ -76,12 +76,14 @@ endif
 GENERATED :=
 OBJECTS :=
 
+GENERATED += $(OBJDIR)/CollisionDetection.o
 GENERATED += $(OBJDIR)/CollisionResolution.o
 GENERATED += $(OBJDIR)/Fizz.o
 GENERATED += $(OBJDIR)/PhysicsEnvironment.o
 GENERATED += $(OBJDIR)/PhysicsObject.o
 GENERATED += $(OBJDIR)/Polygon.o
 GENERATED += $(OBJDIR)/Simplex.o
+OBJECTS += $(OBJDIR)/CollisionDetection.o
 OBJECTS += $(OBJDIR)/CollisionResolution.o
 OBJECTS += $(OBJDIR)/Fizz.o
 OBJECTS += $(OBJDIR)/PhysicsEnvironment.o
@@ -151,22 +153,25 @@ endif
 # File Rules
 # #############################################
 
-$(OBJDIR)/CollisionResolution.o: src/CollisionResolution.cpp
+$(OBJDIR)/CollisionDetection.o: src/Collisions/CollisionDetection.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/CollisionResolution.o: src/Collisions/CollisionResolution.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/Simplex.o: src/Collisions/Simplex.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Fizz.o: src/Fizz.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/PhysicsObject.o: src/Objects/PhysicsObject.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/Polygon.o: src/Objects/Polygon.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/PhysicsEnvironment.o: src/PhysicsEnvironment.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/PhysicsObject.o: src/PhysicsObject.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/Polygon.o: src/Polygon.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/Simplex.o: src/Simplex.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

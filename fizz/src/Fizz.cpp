@@ -5,8 +5,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Polygon.hpp"
-#include "Simplex.hpp"
+#include "Objects/Polygon.hpp"
+#include "Collisions/Simplex.hpp"
 #include "PhysicsEnvironment.hpp"
 
 using namespace Nutella;
