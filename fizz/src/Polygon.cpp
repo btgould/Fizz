@@ -6,9 +6,8 @@
 namespace Fizz {
 	using namespace Nutella;
 
-	Polygon::Polygon(const std::vector<glm::vec2>& points, const glm::vec2& pos /*= {0.0, 0.0}*/)
-		: m_Points(points), m_NumPoints(points.size()), m_Position(pos), m_Rotation(0.0f),
-		  m_Scale(1.0f, 1.0f), m_Velocity(0.0f, 0.0f), m_InvMass(1.0f), m_Restitution(0.8f),
+	Polygon::Polygon(const std::vector<glm::vec2>& points)
+		: m_Points(points), m_NumPoints(points.size()),
 		  m_Shader(Shader::Create("fizz/res/shaders/Mesh.shader")) {
 		// use point data to create a Vertex Array
 		VertexBufferLayout layout;
@@ -30,13 +29,9 @@ namespace Fizz {
 		m_VAO = VertexArray::Create(layout, vbo, ibo);
 
 		m_TransformedPoints.reserve(m_NumPoints);
-		UpdatePoints();
 	}
 
-	Polygon::Polygon(PolygonType type, float size, const glm::vec2& pos)
-		: m_Position(pos), m_Rotation(0.0f), m_Scale(size, size), m_Velocity(0.0f, 0.0f),
-		  m_InvMass(1.0f), m_Restitution(0.8f),
-		  m_Shader(Shader::Create("fizz/res/shaders/Mesh.shader")) {
+	Polygon::Polygon(PolygonType type) : m_Shader(Shader::Create("fizz/res/shaders/Mesh.shader")) {
 		std::vector<uint32_t> vertexOrder;
 
 		float halfSqrt3 = glm::sqrt(3) / 2;
@@ -78,29 +73,20 @@ namespace Fizz {
 		m_VAO = VertexArray::Create(layout, vbo, ibo);
 
 		m_TransformedPoints.reserve(m_NumPoints);
-		UpdatePoints();
 	}
 
 	Polygon::~Polygon() {}
 
 	void Polygon::Render() { Renderer::Submit(m_VAO, m_Shader, m_TRSMat); }
 
-	void Polygon::Update() {
-		NT_PROFILE_FUNC();
-
-		m_Position += m_Velocity;
-		UpdatePoints();
-	}
-
 	glm::vec2 Polygon::Support(const glm::vec2& dir) const {
 		NT_PROFILE_FUNC();
 
 		glm::vec2 supportPoint = m_TransformedPoints[0];
-		float maxSupportDist = dir.x * supportPoint.x + dir.y * supportPoint.y;
+		float maxSupportDist = glm::dot(supportPoint, dir);
 
 		for (int i = 1; i < m_NumPoints; i++) {
-			float currSupportDist =
-				dir.x * m_TransformedPoints[i].x + dir.y * m_TransformedPoints[i].y;
+			float currSupportDist = glm::dot(m_TransformedPoints[i], dir);
 			if (currSupportDist > maxSupportDist) {
 				maxSupportDist = currSupportDist;
 				supportPoint = m_TransformedPoints[i];
@@ -110,24 +96,21 @@ namespace Fizz {
 		return supportPoint;
 	}
 
-	void Polygon::UpdateTRSMat() {
-		NT_PROFILE_FUNC();
+	void Polygon::SetTransform(const Transform& transform) {
+		if (m_Transform != transform) {
+			m_Transform = transform;
 
-		// reverse order b/c column major ordering?
-		m_TRSMat = glm::translate(glm::mat4(1.0f), {m_Position.x, m_Position.y, 0.0f});
-		m_TRSMat = glm::rotate(m_TRSMat, m_Rotation, {0.0f, 0.0f, 1.0f});
-		m_TRSMat = glm::scale(m_TRSMat, {m_Scale.x, m_Scale.y, 1.0f});
-	}
+			// Update TRS matrix
+			m_TRSMat = glm::translate(glm::mat4(1.0f),
+									  {m_Transform.position.x, m_Transform.position.y, 0.0f});
+			m_TRSMat = glm::rotate(m_TRSMat, m_Transform.rotation, {0.0f, 0.0f, 1.0f});
+			m_TRSMat = glm::scale(m_TRSMat, {m_Transform.scale.x, m_Transform.scale.y, 1.0f});
 
-	void Polygon::UpdatePoints() {
-		// TODO: is there a way to be more efficient about this so that I don't have to do this
-		// calculation on both the CPU and GPU?
-		NT_PROFILE_FUNC();
-
-		UpdateTRSMat();
-
-		for (uint32_t i = 0; i < m_NumPoints; i++) {
-			m_TransformedPoints[i] = m_TRSMat * glm::vec4(m_Points[i].x, m_Points[i].y, 0.0f, 1.0f);
+			// Update transformed points list
+			for (uint32_t i = 0; i < m_NumPoints; i++) {
+				m_TransformedPoints[i] =
+					m_TRSMat * glm::vec4(m_Points[i].x, m_Points[i].y, 0.0f, 1.0f);
+			}
 		}
 	}
 } // namespace Fizz

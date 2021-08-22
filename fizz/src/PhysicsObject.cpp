@@ -3,7 +3,22 @@
 #include "Simplex.hpp"
 
 namespace Fizz {
-	// checks is simplex contains origin, returning true if it does. p2wise, it removes any
+	PhysicsObject::PhysicsObject(Nutella::Ref<Shape> shape, Transform transform)
+		: m_Shape(shape), m_Transform(transform), m_Velocity(glm::vec2(0.0f)), m_InvMass(1.0f),
+		  m_Restitution(0.8f) {
+		m_Shape->SetTransform(m_Transform);
+	}
+
+	void PhysicsObject::Update() {
+		NT_PROFILE_FUNC();
+
+		m_Transform.position += m_Velocity;
+		m_Shape->SetTransform(m_Transform);
+	}
+
+	void PhysicsObject::Render() { m_Shape->Render(); }
+
+	// checks is simplex contains origin, returning true if it does. Otherwise, it removes any
 	// redundant points on the simplex
 	bool UpdateSimplex(Simplex& s);
 	// calculates the normal of the simplex pointed towards the origin
@@ -13,14 +28,17 @@ namespace Fizz {
 		NT_PROFILE_FUNC();
 
 		glm::vec2 nextDir = p2->GetPos() - p1->GetPos();
+		if (nextDir == glm::vec2(0.0f, 0.0f)) {
+			nextDir = glm::vec2(1.0f, 0.0f);
+		}
 
 		// add first point to simplex
-		glm::vec2 supportPoint(p1->MinkowskiDiffSupport(p2, nextDir));
+		glm::vec2 supportPoint(MinkowskiDiffSupport(p1, p2, nextDir));
 		Simplex s({supportPoint});
 		nextDir = -supportPoint;
 
 		// add second point to simplex
-		supportPoint = p1->MinkowskiDiffSupport(p2, nextDir);
+		supportPoint = MinkowskiDiffSupport(p1, p2, nextDir);
 		if (glm::dot(nextDir, supportPoint) < 0) {
 			// simplex cannot possibly contain origin
 			return false;
@@ -30,7 +48,7 @@ namespace Fizz {
 
 		while (true) {
 			// calculate + add next point
-			supportPoint = p1->MinkowskiDiffSupport(p2, nextDir);
+			supportPoint = MinkowskiDiffSupport(p1, p2, nextDir);
 			if (glm::dot(nextDir, supportPoint) < 0) {
 				// simplex cannot possibly contain origin
 				return false;
@@ -95,14 +113,17 @@ namespace Fizz {
 		NT_PROFILE_FUNC();
 
 		glm::vec2 nextDir = p2->GetPos() - p1->GetPos();
+		if (nextDir == glm::vec2(0.0f, 0.0f)) {
+			nextDir = glm::vec2(1.0f, 0.0f);
+		}
 
-		Simplex s({p1->MinkowskiDiffSupport(p2, nextDir)});
-		s.Add(p1->MinkowskiDiffSupport(p2, -nextDir));
+		Simplex s({MinkowskiDiffSupport(p1, p2, nextDir)});
+		s.Add(MinkowskiDiffSupport(p1, p2, -nextDir));
 
 		nextDir = -Line(s);
 
 		while (true) {
-			s.Add(p1->MinkowskiDiffSupport(p2, nextDir));
+			s.Add(MinkowskiDiffSupport(p1, p2, nextDir));
 
 			// check if we are no longer making significant progress
 			float newSupportProj = glm::dot(nextDir, s[2]);
@@ -192,12 +213,12 @@ namespace Fizz {
 		}
 
 		// add first point to simplex
-		glm::vec2 supportPoint(p1->MinkowskiDiffSupport(p2, nextDir));
+		glm::vec2 supportPoint(MinkowskiDiffSupport(p1, p2, nextDir));
 		Simplex s({supportPoint});
 		nextDir = -supportPoint;
 
 		// add second point to simplex
-		supportPoint = p1->MinkowskiDiffSupport(p2, nextDir);
+		supportPoint = MinkowskiDiffSupport(p1, p2, nextDir);
 		if (glm::dot(nextDir, supportPoint) < 0) {
 			// simplex cannot possibly contain origin
 			return Collision::None(p1, p2);
@@ -207,7 +228,7 @@ namespace Fizz {
 
 		while (true) {
 			// calculate + add next point
-			supportPoint = p1->MinkowskiDiffSupport(p2, nextDir);
+			supportPoint = MinkowskiDiffSupport(p1, p2, nextDir);
 			if (glm::dot(nextDir, supportPoint) < 0) {
 				// simplex cannot possibly contain origin
 				return Collision::None(p1, p2);
@@ -263,7 +284,7 @@ namespace Fizz {
 				closestDir = norm;
 			}
 
-			glm::vec2 nextPoint = p1->MinkowskiDiffSupport(p2, closestDir);
+			glm::vec2 nextPoint = MinkowskiDiffSupport(p1, p2, closestDir);
 
 			// check if we are still making significant progress
 			float oldDist = closestDist;

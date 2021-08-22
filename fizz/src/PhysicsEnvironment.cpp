@@ -34,7 +34,7 @@ namespace Fizz {
 			for (uint32_t j = i + 1; j < m_Objects.size(); j++) {
 				Collision collision = GJKGetCollision(m_Objects[i], m_Objects[j]);
 
-				if (collision.MTV != glm::vec2(0.0f, 0.0f)) {
+				if (collision.exists) {
 					m_Collisions.push_back(collision);
 				}
 			}

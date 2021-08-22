@@ -21,17 +21,17 @@ class FizzLayer : public Layer {
 							 true) {
 
 		Ref<PhysicsObject> moved =
-			CreateRef<Polygon>(PolygonType::SQUARE, 0.2, glm::vec2(-0.5f, 0.0f));
+			CreateRef<PhysicsObject>(CreateRef<Polygon>(PolygonType::SQUARE));
 		moved->ApplyImpulse(glm::vec2(0.01f, 0.0f));
 
-		Ref<PhysicsObject> wallRight =
-			CreateRef<Polygon>(PolygonType::SQUARE, 0.3, glm::vec2(1.0f, 0.0f));
-		wallRight->SetScale(glm::vec2(0.2f, 1.0f));
+		Ref<PhysicsObject> wallRight = CreateRef<PhysicsObject>(
+			CreateRef<Polygon>(PolygonType::SQUARE),
+			Transform({glm::vec2(1.0f, 0.0f), 0.0f, glm::vec2(0.2f, 1.0f)}));
 		wallRight->SetInvMass(0.0f);
 
-		Ref<PhysicsObject> wallLeft =
-			CreateRef<Polygon>(PolygonType::SQUARE, 0.3, glm::vec2(-1.0f, 0.0f));
-		wallLeft->SetScale(glm::vec2(0.2f, 1.0f));
+		Ref<PhysicsObject> wallLeft = CreateRef<PhysicsObject>(
+			CreateRef<Polygon>(PolygonType::SQUARE),
+			Transform({glm::vec2(-1.0f, 0.0f), 0.0f, glm::vec2(0.2f, 1.0f)}));
 		wallLeft->SetInvMass(0.0f);
 
 		m_PhysicsEnv.Add(moved);
@@ -77,7 +77,9 @@ class FizzLayer : public Layer {
 			ImGui::SliderFloat2("Scale", glm::value_ptr(localScale), 0.0f, 2.0f);
 			ImGui::PopID();
 
-			object->SetTRS(localPos, localRot, localScale);
+			object->SetPos(localPos);
+			object->SetRot(localRot);
+			object->SetScale(localScale);
 		}
 	}
 

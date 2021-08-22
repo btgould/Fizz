@@ -3,38 +3,60 @@
 #include <glm/glm.hpp>
 #include <Nutella.hpp>
 
-namespace Fizz {
-	// forward declaration
-	struct Collision;
+#include "Shape.hpp"
 
+namespace Fizz {
 	class PhysicsObject {
 	  public:
-		virtual void Render() = 0;
-		virtual void Update() = 0;
+		PhysicsObject(Nutella::Ref<Shape> shape,
+					  Transform transform = {glm::vec2(0.0f, 0.0f), 0.0f, glm::vec2(0.2f, 0.2f)});
 
-		virtual glm::vec2 Support(const glm::vec2& dir) const = 0;
-		inline glm::vec2 MinkowskiDiffSupport(Nutella::Ref<PhysicsObject>& other,
-											  const glm::vec2& dir) const {
-			NT_PROFILE_FUNC();
+		void Update();
+		void Render();
 
-			return this->Support(dir) - other->Support(-dir);
+		inline void ApplyImpulse(const glm::vec2& impulse) { m_Velocity += impulse; }
+
+		inline const glm::vec2& GetPos() const { return m_Transform.position; }
+		inline void SetPos(const glm::vec2& position) {
+			m_Transform.position = position;
+			m_Shape->SetTransform(m_Transform);
+		}
+		inline float GetRot() const { return m_Transform.rotation; }
+		inline void SetRot(float rotation) {
+			m_Transform.rotation = rotation;
+			m_Shape->SetTransform(m_Transform);
+		}
+		inline const glm::vec2& GetScale() const { return m_Transform.scale; }
+		inline void SetScale(const glm::vec2& scale) {
+			m_Transform.scale = scale;
+			m_Shape->SetTransform(m_Transform);
+		}
+		inline void SetTransform(const Transform& transform) {
+			m_Transform = transform;
+			m_Shape->SetTransform(m_Transform);
+		}
+		inline void SetTransform(const glm::vec2& pos, const float rot, const glm::vec2& scale) {
+			m_Transform = {pos, rot, scale};
+			m_Shape->SetTransform(m_Transform);
 		}
 
-		virtual glm::vec2 GetPos() const = 0;
-		virtual void SetPos(const glm::vec2& pos) = 0;
-		virtual float GetRot() const = 0;
-		virtual void SetRot(const float rot) = 0;
-		virtual glm::vec2 GetScale() const = 0;
-		virtual void SetScale(const glm::vec2& scale) = 0;
-		virtual void SetTRS(const glm::vec2& pos, const float rot, const glm::vec2& scale) = 0;
+		inline const glm::vec2& GetVelocity() const { return m_Velocity; }
 
-		virtual const glm::vec2& GetVelocity() const = 0;
-		virtual void ApplyImpulse(const glm::vec2& impulse) = 0;
+		inline float GetInvMass() const { return m_InvMass; }
+		inline void SetInvMass(float invMass) { m_InvMass = invMass; }
+		inline float GetRestitution() const { return m_Restitution; }
+		inline void SetRestitution(float restitution) { m_Restitution = restitution; }
 
-		virtual float GetInvMass() const = 0;
-		virtual void SetInvMass(float invMass) = 0;
-		virtual float GetRestitution() const = 0;
-		virtual void SetRestitution(float restitution) = 0;
+		inline Nutella::Ref<Shape> GetShape() const { return m_Shape; }
+
+	  private:
+		Nutella::Ref<Shape> m_Shape;
+		Transform m_Transform;
+
+		glm::vec2 m_Velocity;
+
+		float m_InvMass;
+		float m_Restitution;
 	};
 
 	struct Collision {
@@ -51,6 +73,13 @@ namespace Fizz {
 		}
 	};
 
+	inline glm::vec2 MinkowskiDiffSupport(const Nutella::Ref<PhysicsObject>& p1,
+										  const Nutella::Ref<PhysicsObject>& p2,
+										  const glm::vec2& dir) {
+		NT_PROFILE_FUNC();
+
+		return p1->GetShape()->Support(dir) - p2->GetShape()->Support(-dir);
+	}
 	bool GJKColliding(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2);
 	glm::vec2 GJKDistance(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2,
 						  float tolerance = glm::pow(10, -5));
