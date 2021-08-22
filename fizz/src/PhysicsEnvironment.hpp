@@ -6,7 +6,7 @@
 namespace Fizz {
 	class PhysicsEnvironment {
 	  public:
-		void Update();
+		void Update(Nutella::Timestep ts);
 		void Render();
 
 		inline void Add(Nutella::Ref<Fizz::PhysicsObject> object) { m_Objects.push_back(object); }
@@ -15,7 +15,7 @@ namespace Fizz {
 		inline std::vector<Fizz::Collision>& GetCollisions() { return m_Collisions; };
 
 	  private:
-		void UpdateObjects();
+		void UpdateObjects(Nutella::Timestep ts);
 		void FindCollisions();
 		void ResolveCollisions();
 

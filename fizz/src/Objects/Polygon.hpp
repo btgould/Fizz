@@ -34,8 +34,8 @@ namespace Fizz {
 		std::vector<glm::vec2> m_TransformedPoints;
 		glm::mat4 m_TRSMat;
 
-		// TODO: these should be shared between instances
 		Nutella::Ref<Nutella::VertexArray> m_VAO;
+		// TODO: this should be shared between instances
 		Nutella::Ref<Nutella::Shader> m_Shader;
 	};
 } // namespace Fizz

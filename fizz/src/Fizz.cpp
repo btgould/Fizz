@@ -22,7 +22,7 @@ class FizzLayer : public Layer {
 
 		Ref<PhysicsObject> moved =
 			CreateRef<PhysicsObject>(CreateRef<Polygon>(PolygonType::SQUARE));
-		moved->ApplyImpulse(glm::vec2(0.01f, 0.0f));
+		moved->ApplyImpulse(glm::vec2(0.5f, 0.0f));
 
 		Ref<PhysicsObject> wallRight = CreateRef<PhysicsObject>(
 			CreateRef<Polygon>(PolygonType::SQUARE),
@@ -42,7 +42,7 @@ class FizzLayer : public Layer {
 	virtual void OnUpdate(Timestep ts) override {
 		m_CameraController.OnUpdate(ts);
 
-		m_PhysicsEnv.Update();
+		m_PhysicsEnv.Update(ts);
 
 		Renderer::BeginScene(m_CameraController.GetCamera());
 		m_PhysicsEnv.Render();

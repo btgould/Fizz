@@ -6,10 +6,10 @@ using namespace Nutella;
 using namespace Fizz;
 
 namespace Fizz {
-	void PhysicsEnvironment::Update() {
+	void PhysicsEnvironment::Update(Nutella::Timestep ts) {
 		NT_PROFILE_FUNC();
 
-		UpdateObjects();
+		UpdateObjects(ts);
 		FindCollisions();
 		ResolveCollisions();
 	}
@@ -19,9 +19,9 @@ namespace Fizz {
 			object->Render();
 	}
 
-	void PhysicsEnvironment::UpdateObjects() {
+	void PhysicsEnvironment::UpdateObjects(Nutella::Timestep ts) {
 		for (Ref<PhysicsObject>& object : m_Objects)
-			object->Update();
+			object->Update(ts);
 	}
 
 	void PhysicsEnvironment::FindCollisions() {

@@ -11,10 +11,11 @@ namespace Fizz {
 		PhysicsObject(Nutella::Ref<Shape> shape,
 					  Transform transform = {glm::vec2(0.0f, 0.0f), 0.0f, glm::vec2(0.2f, 0.2f)});
 
-		void Update();
+		void Update(Nutella::Timestep ts);
 		void Render();
 
 		inline void ApplyImpulse(const glm::vec2& impulse) { m_Velocity += impulse; }
+		inline void ApplyForce(const glm::vec2& force) { m_Force += force; }
 
 		inline const glm::vec2& GetPos() const { return m_Transform.position; }
 		inline void SetPos(const glm::vec2& position) {
@@ -54,6 +55,7 @@ namespace Fizz {
 		Transform m_Transform;
 
 		glm::vec2 m_Velocity;
+		glm::vec2 m_Force;
 
 		float m_InvMass;
 		float m_Restitution;
