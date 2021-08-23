@@ -123,6 +123,7 @@ namespace Fizz {
 	}
 
 	glm::vec2 Line(const Simplex& s) {
+		// TEMP: consider a way of doing this that is less senstive to fp errors
 		NT_ASSERT(s.Size() == 2, "Invalid Simplex during collision detection!");
 
 		if (s[0] == s[1])
@@ -256,7 +257,7 @@ namespace Fizz {
 			}
 
 			// calculate next point to add to simplex
-			if (closestDist < glm::pow(10, -8)) {
+			if (closestDist < glm::pow(10, -15)) {
 				// origin is on edge of simplex -> need to search along edge normals
 				glm::vec2 edge = s[closestIdx % s.Size()] - s[closestIdx - 1];
 				glm::vec2 norm(-edge.y, edge.x);

@@ -27,4 +27,23 @@ namespace Fizz {
 			collision.collided->ApplyImpulse(invMassB * impulse);
 		}
 	}
+
+	void SinkingCorrection(const Collision& collision, const float correctionWeight,
+						   const float penetrationThreshold) {
+		// TODO: bug where after using this to resolve collisions objects will coninue inching away
+		// on the wrong axis (try breaking when x-comp != 0)
+
+		float correctionDist;
+		if ((correctionDist = collision.penetrationDist - penetrationThreshold) > 0) {
+			Ref<PhysicsObject> A = collision.collider;
+			Ref<PhysicsObject> B = collision.collided;
+
+			float sysMass = A->GetInvMass() + B->GetInvMass();
+			glm::vec2 correction = collision.MTV * correctionDist * correctionWeight / sysMass;
+
+			A->SetPos(A->GetPos() - A->GetInvMass() * correction);
+			B->SetPos(B->GetPos() + B->GetInvMass() * correction);
+		}
+	}
+
 } // namespace Fizz

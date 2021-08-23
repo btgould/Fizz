@@ -44,7 +44,9 @@ namespace Fizz {
 	void PhysicsEnvironment::ResolveCollisions() {
 		NT_PROFILE_FUNC();
 
-		for (Collision collision : m_Collisions)
+		for (Collision collision : m_Collisions) {
 			ResolveCollision(collision);
+			SinkingCorrection(collision);
+		}
 	}
 } // namespace Fizz

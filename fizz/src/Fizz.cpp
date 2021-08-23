@@ -20,28 +20,24 @@ class FizzLayer : public Layer {
 								 (float) Application::get().getWindow().GetHeight(),
 							 true) {
 
-		Ref<PhysicsObject> moved =
-			CreateRef<PhysicsObject>(CreateRef<Polygon>(PolygonType::SQUARE));
-		moved->ApplyImpulse(glm::vec2(0.5f, 0.0f));
-
-		Ref<PhysicsObject> wallRight = CreateRef<PhysicsObject>(
+		Ref<PhysicsObject> moved = CreateRef<PhysicsObject>(
 			CreateRef<Polygon>(PolygonType::SQUARE),
-			Transform({glm::vec2(1.0f, 0.0f), 0.0f, glm::vec2(0.2f, 1.0f)}));
-		wallRight->SetInvMass(0.0f);
+			Transform({glm::vec2(0.4f, 0.6f), 0.0f, glm::vec2(0.2f, 0.2f)}));
 
-		Ref<PhysicsObject> wallLeft = CreateRef<PhysicsObject>(
+		Ref<PhysicsObject> floor = CreateRef<PhysicsObject>(
 			CreateRef<Polygon>(PolygonType::SQUARE),
-			Transform({glm::vec2(-1.0f, 0.0f), 0.0f, glm::vec2(0.2f, 1.0f)}));
-		wallLeft->SetInvMass(0.0f);
+			Transform({glm::vec2(0.0f, -0.6f), 0.0f, glm::vec2(1.0f, 0.2f)}));
+		floor->SetInvMass(0.0f);
 
 		m_PhysicsEnv.Add(moved);
-		m_PhysicsEnv.Add(wallRight);
-		m_PhysicsEnv.Add(wallLeft);
+		m_PhysicsEnv.Add(floor);
 	}
 
 	virtual void OnUpdate(Timestep ts) override {
 		m_CameraController.OnUpdate(ts);
 
+		for (Ref<PhysicsObject> object : m_PhysicsEnv.GetObjects())
+			object->ApplyForce(glm::vec2(0.0f, -0.5f)); // gravity
 		m_PhysicsEnv.Update(ts);
 
 		Renderer::BeginScene(m_CameraController.GetCamera());
