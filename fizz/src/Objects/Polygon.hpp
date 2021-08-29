@@ -23,6 +23,7 @@ namespace Fizz {
 		virtual void Render() override;
 
 		virtual glm::vec2 Support(const glm::vec2& dir) const override;
+		virtual AABB GetAABB() const override;
 
 		virtual void SetTransform(const Transform& transform) override;
 

@@ -20,24 +20,42 @@ class FizzLayer : public Layer {
 								 (float) Application::get().getWindow().GetHeight(),
 							 true) {
 
-		Ref<PhysicsObject> moved = CreateRef<PhysicsObject>(
-			CreateRef<Polygon>(PolygonType::SQUARE),
-			Transform({glm::vec2(0.4f, 0.6f), 0.0f, glm::vec2(0.2f, 0.2f)}));
+		// Ref<PhysicsObject> moved = CreateRef<PhysicsObject>(
+		// 	CreateRef<Polygon>(PolygonType::SQUARE),
+		// 	Transform({glm::vec2(0.4f, 0.6f), 0.0f, glm::vec2(0.2f, 0.2f)}));
 
-		Ref<PhysicsObject> floor = CreateRef<PhysicsObject>(
-			CreateRef<Polygon>(PolygonType::SQUARE),
-			Transform({glm::vec2(0.0f, -0.6f), 0.0f, glm::vec2(1.0f, 0.2f)}));
-		floor->SetInvMass(0.0f);
+		// Ref<PhysicsObject> floor = CreateRef<PhysicsObject>(
+		// 	CreateRef<Polygon>(PolygonType::SQUARE),
+		// 	Transform({glm::vec2(0.0f, -0.6f), 0.0f, glm::vec2(1.0f, 0.2f)}));
+		// floor->SetInvMass(0.0f);
 
-		m_PhysicsEnv.Add(moved);
-		m_PhysicsEnv.Add(floor);
+		// m_PhysicsEnv.Add(moved);
+		// m_PhysicsEnv.Add(floor);
+
+		srand(time(NULL));
+
+		for (uint32_t i = 0; i < 20; i++) {
+			PolygonType polygonType =
+				static_cast<PolygonType>(std::rand() % (int) PolygonType::COUNT);
+			float x = 8.0 * std::rand() / RAND_MAX - 4;
+			float y = 8.0 * std::rand() / RAND_MAX - 4;
+			float rot = 2 * 3.1415f * std::rand() / RAND_MAX;
+			float scaleX = (float) std::rand() / RAND_MAX / 2;
+			float scaleY = (float) std::rand() / RAND_MAX / 2;
+
+			Ref<PhysicsObject> object = CreateRef<PhysicsObject>(
+				CreateRef<Polygon>(polygonType),
+				Transform({glm::vec2(x, y), rot, glm::vec2(scaleX, scaleY)}));
+
+			m_PhysicsEnv.Add(object);
+		}
 	}
 
 	virtual void OnUpdate(Timestep ts) override {
 		m_CameraController.OnUpdate(ts);
 
-		for (Ref<PhysicsObject> object : m_PhysicsEnv.GetObjects())
-			object->ApplyForce(glm::vec2(0.0f, -0.5f)); // gravity
+		// for (Ref<PhysicsObject> object : m_PhysicsEnv.GetObjects())
+		// 	object->ApplyForce(glm::vec2(0.0f, -0.5f)); // gravity
 		m_PhysicsEnv.Update(ts);
 
 		Renderer::BeginScene(m_CameraController.GetCamera());
@@ -71,11 +89,16 @@ class FizzLayer : public Layer {
 			ImGui::SliderFloat2("Position", glm::value_ptr(localPos), -2.0f, 2.0f);
 			ImGui::SliderFloat("Rotation", &localRot, 0.0f, 2 * 3.1415f);
 			ImGui::SliderFloat2("Scale", glm::value_ptr(localScale), 0.0f, 2.0f);
+
+			AABB aabb = object->GetShape()->GetAABB();
+			std::string contained =
+				AABB(glm::vec2(-5.0f), glm::vec2(0.0f)).Contains(aabb) ? "true" : "false";
+			ImGui::Text("AABB: <%-.3f, %-.3f>, <%-.3f, %-.3f>", aabb.min.x, aabb.min.y, aabb.max.x,
+						aabb.max.y);
+			ImGui::Text("Contained in bottom left: %s", contained.c_str());
 			ImGui::PopID();
 
-			object->SetPos(localPos);
-			object->SetRot(localRot);
-			object->SetScale(localScale);
+			object->SetTransform(localPos, localRot, localScale);
 		}
 	}
 

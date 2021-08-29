@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "Objects/AABB.hpp"
 
 namespace Fizz {
 	struct Transform {
@@ -21,6 +22,7 @@ namespace Fizz {
 		virtual void Render() = 0;
 
 		virtual glm::vec2 Support(const glm::vec2& dir) const = 0;
+		virtual AABB GetAABB() const = 0;
 
 		virtual void SetTransform(const Transform& transform) = 0;
 	};

@@ -28,7 +28,7 @@ namespace Fizz {
 
 		m_VAO = VertexArray::Create(layout, vbo, ibo);
 
-		m_TransformedPoints.reserve(m_NumPoints);
+		m_TransformedPoints.resize(m_NumPoints);
 	}
 
 	Polygon::Polygon(PolygonType type) : m_Shader(Shader::Create("fizz/res/shaders/Mesh.shader")) {
@@ -72,7 +72,7 @@ namespace Fizz {
 
 		m_VAO = VertexArray::Create(layout, vbo, ibo);
 
-		m_TransformedPoints.reserve(m_NumPoints);
+		m_TransformedPoints.resize(m_NumPoints);
 	}
 
 	Polygon::~Polygon() {}
@@ -94,6 +94,19 @@ namespace Fizz {
 		}
 
 		return supportPoint;
+	}
+
+	AABB Polygon::GetAABB() const {
+		glm::vec2 min(FLT_MAX), max(-FLT_MAX);
+
+		for (glm::vec2 point : m_TransformedPoints) {
+			min.x = glm::min(min.x, point.x);
+			min.y = glm::min(min.y, point.y);
+			max.x = glm::max(max.x, point.x);
+			max.y = glm::max(max.y, point.y);
+		}
+
+		return AABB(min, max);
 	}
 
 	void Polygon::SetTransform(const Transform& transform) {
