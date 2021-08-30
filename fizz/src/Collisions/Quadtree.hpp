@@ -6,7 +6,8 @@
 #include "Objects/PhysicsObject.hpp"
 
 namespace Fizz {
-	using CollisionList = std::vector<std::vector<Nutella::Ref<PhysicsObject>>>;
+	using CollisionList =
+		std::vector<std::pair<Nutella::Ref<PhysicsObject>, Nutella::Ref<PhysicsObject>>>;
 
 	class Quadtree {
 	  public:
@@ -16,6 +17,14 @@ namespace Fizz {
 		void Clear();
 		void Insert(Nutella::Ref<PhysicsObject>& object);
 		CollisionList GetPossibleCollisions();
+		std::vector<Nutella::Ref<PhysicsObject>> GetPossibleCollisions(const AABB& bounds);
+
+	  private:
+		void GetPossibleCollisions(CollisionList& collisions);
+		void GetPossibleChildCollisions(const Nutella::Ref<PhysicsObject>& object,
+										CollisionList& collisions);
+		void GetPossibleCollisions(const AABB& bounds,
+								   std::vector<Nutella::Ref<PhysicsObject>>& collisions);
 
 	  private:
 		static const uint32_t MAX_LEVELS;

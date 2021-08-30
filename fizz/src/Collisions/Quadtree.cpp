@@ -67,28 +67,72 @@ namespace Fizz {
 	}
 
 	CollisionList Quadtree::GetPossibleCollisions() {
-		CollisionList collisionList;
+		CollisionList collisions;
+		GetPossibleCollisions(collisions);
+		return collisions;
+	}
 
-		// Add all objects from children
+	void Quadtree::GetPossibleCollisions(CollisionList& collisions) {
+		// find all collisions between objects in current node
+		for (uint32_t i = 0; i < m_Objects.size(); i++) {
+			for (u_int32_t j = i + 1; j < m_Objects.size(); j++) {
+				if (m_Objects[i]->GetShape()->GetAABB().Intersects(
+						m_Objects[j]->GetShape()->GetAABB()))
+					collisions.push_back({m_Objects[i], m_Objects[j]});
+			}
+		}
+
+		if (m_Nodes) {
+			// find all collisions between an object in this node and an object in a child node
+			for (uint32_t i = 0; i < m_Objects.size(); i++) {
+				for (uint32_t j = 0; j < 4; j++) {
+					m_Nodes[j].GetPossibleChildCollisions(m_Objects[i], collisions);
+				}
+			}
+
+			// find all collisions in child nodes
+			for (uint32_t i = 0; i < 4; i++) {
+				m_Nodes[i].GetPossibleCollisions(collisions);
+			}
+		}
+	}
+
+	void Quadtree::GetPossibleChildCollisions(const Nutella::Ref<PhysicsObject>& object,
+											  CollisionList& collisions) {
+		for (auto& other : m_Objects) {
+			if (other->GetShape()->GetAABB().Intersects(object->GetShape()->GetAABB())) {
+				collisions.push_back({object, other});
+			}
+		}
+
 		if (m_Nodes) {
 			for (uint32_t i = 0; i < 4; i++) {
-				CollisionList child = m_Nodes[i].GetPossibleCollisions();
-				collisionList.insert(collisionList.end(), child.begin(), child.end());
+				m_Nodes[i].GetPossibleChildCollisions(object, collisions);
+			}
+		}
+	}
+
+	std::vector<Nutella::Ref<PhysicsObject>> Quadtree::GetPossibleCollisions(const AABB& bounds) {
+		std::vector<Nutella::Ref<PhysicsObject>> collisions;
+		GetPossibleCollisions(bounds, collisions);
+		return collisions;
+	}
+
+	void Quadtree::GetPossibleCollisions(const AABB& bounds,
+										 std::vector<Nutella::Ref<PhysicsObject>>& collisions) {
+		// check AABB against all objects in current node
+		for (auto other : m_Objects) {
+			if (other->GetShape()->GetAABB().Intersects(bounds)) {
+				collisions.push_back(other);
 			}
 		}
 
-		// Add objects in parent to each child list
-		if (m_Objects.size() != 0) {
-			if (collisionList.size() == 0) {
-				// no objects in any child list, add parent list unmodified
-				collisionList.push_back(m_Objects);
-			} else {
-				// child lists exist, add all parent objects to each
-				for (auto& collisionSet : collisionList)
-					collisionSet.insert(collisionSet.end(), m_Objects.begin(), m_Objects.end());
-			}
+		// check AABB against all objects in applicable child nodes
+		if (m_Nodes) {
+			for (uint32_t i = 0; i < 4; i++)
+				if (m_Nodes[i].m_Bounds.Intersects(bounds)) {
+					GetPossibleCollisions(bounds, collisions);
+				}
 		}
-
-		return collisionList;
 	}
 } // namespace Fizz

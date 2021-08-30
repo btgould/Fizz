@@ -18,10 +18,7 @@ namespace Fizz {
 	}
 
 	bool AABB::Intersects(const AABB& other) {
-		bool inX = (other.min.x < min.x && other.max.x > min.x) ||
-				   (other.max.x > max.x && other.min.x < max.x);
-		bool inY = (other.min.y < min.y && other.max.y > min.y) ||
-				   (other.max.y > max.y && other.min.y < max.y);
-		return inX && inY;
+		return !(min.x > other.max.x || max.x < other.min.x || min.y > other.max.y ||
+				 max.y < other.min.y);
 	}
 } // namespace Fizz

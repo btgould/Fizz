@@ -34,11 +34,11 @@ class FizzLayer : public Layer {
 
 		srand(time(NULL));
 
-		for (uint32_t i = 0; i < 20; i++) {
+		for (uint32_t i = 0; i < 100; i++) {
 			PolygonType polygonType =
 				static_cast<PolygonType>(std::rand() % (int) PolygonType::COUNT);
-			float x = 8.0 * std::rand() / RAND_MAX - 4;
-			float y = 8.0 * std::rand() / RAND_MAX - 4;
+			float x = 10.0 * std::rand() / RAND_MAX - 5;
+			float y = 10.0 * std::rand() / RAND_MAX - 5;
 			float rot = 2 * 3.1415f * std::rand() / RAND_MAX;
 			float scaleX = (float) std::rand() / RAND_MAX / 2;
 			float scaleY = (float) std::rand() / RAND_MAX / 2;
