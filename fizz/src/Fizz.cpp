@@ -34,7 +34,7 @@ class FizzLayer : public Layer {
 
 		srand(time(NULL));
 
-		for (uint32_t i = 0; i < 100; i++) {
+		for (uint32_t i = 0; i < 50; i++) {
 			PolygonType polygonType =
 				static_cast<PolygonType>(std::rand() % (int) PolygonType::COUNT);
 			float x = 10.0 * std::rand() / RAND_MAX - 5;
@@ -69,6 +69,10 @@ class FizzLayer : public Layer {
 		ImGuiShowPhysicsObjects();
 		ImGui::Separator();
 		ImGuiShowCollisions();
+
+		glm::vec2 distance =
+			GJKDistance(m_PhysicsEnv.GetObjects()[0], m_PhysicsEnv.GetObjects()[1]);
+		ImGui::Text("<%-3.2f, %-3.2f>", distance.x, distance.y);
 
 		ImGui::End();
 	}

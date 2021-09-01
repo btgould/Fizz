@@ -4,6 +4,10 @@
 #include <vector>
 
 namespace Fizz {
+	/* Represents a set of points in 2 dimensional space. Technically, simplices are always affinely
+	   independent, meaning they can never have more than 3 points (in 2D space). However, this
+	   class has a somewhat looser definition, and is used more as an ordered collection of points.
+	 */
 	class Simplex {
 	  private:
 		class Iterator {
@@ -29,10 +33,27 @@ namespace Fizz {
 		Simplex(std::vector<glm::vec2> points);
 		~Simplex();
 
+		/* Adds the given point to the end of the simplex.
+
+		   @param point: The point to add
+		 */
 		void Add(const glm::vec2& point);
+
+		/* Adds the given point simplex at the specified index. All points after the index are moved
+		   back to make room for the new point, which will occupy the given index after insertion.
+
+		   @param point: The point to add
+		   @param idx: The index to insert the point at
+		 */
 		void Add(const glm::vec2& point, uint32_t idx);
+
+		/* Removes the given point from the simplex.
+
+		   @param point: The point to remove
+		 */
 		void Remove(const glm::vec2& point);
 
+		/* Gets the number of points in the simplex */
 		uint32_t Size() const;
 
 		glm::vec2& operator[](uint32_t index);
