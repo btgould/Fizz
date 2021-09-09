@@ -107,6 +107,11 @@ namespace Fizz {
 
 		nextDir = -Line(s);
 
+		// if the border passes through the origin, we can exit early. This also conveniently
+		// prevents an undefined search direction later
+		if (nextDir == glm::vec2(0.0f))
+			return nextDir;
+
 		while (true) {
 			s.Add(MinkowskiDiffSupport(p1, p2, nextDir));
 

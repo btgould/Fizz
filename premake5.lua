@@ -7,6 +7,8 @@ workspace "Fizz"
     configurations {"Debug", "Release", "Dist"}
     architecture "x86_64"
 
+
+nutellaPath = "nutella/"
 include "nutella/client-premake.lua"
 
 IncludeDir = {}
@@ -73,7 +75,7 @@ premake.override(gmake2, 'projectrules', function(base, wks)
         local prjdir = path.getdirectory(path.getrelative(wks.location, prjpath))
         local prjname = path.getname(prjpath)
 
-        -- removed `--no-print-directory` here --
+        -- removed '--no-print-directory' here --
         _x(1,'@${MAKE} -C %s -f %s config=$(%s_config)', prjdir, prjname, cfgvar)
 
         _p('endif')

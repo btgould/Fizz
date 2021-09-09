@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Objects/Polygon.hpp"
+#include "Objects/Circle.hpp"
 #include "Collisions/Simplex.hpp"
 #include "PhysicsEnvironment.hpp"
 
@@ -17,11 +18,10 @@ class FizzLayer : public Layer {
 	FizzLayer()
 		: Layer("Fizziks Simulation"),
 		  m_CameraController((float) Application::get().getWindow().GetWidth() /
-								 (float) Application::get().getWindow().GetHeight(),
-							 true) {
+							 (float) Application::get().getWindow().GetHeight()) {
 
 		// Ref<PhysicsObject> moved = CreateRef<PhysicsObject>(
-		// 	CreateRef<Polygon>(PolygonType::SQUARE),
+		// 	CreateRef<Circle>(0.4),
 		// 	Transform({glm::vec2(0.4f, 0.6f), 0.0f, glm::vec2(0.2f, 0.2f)}));
 
 		// Ref<PhysicsObject> floor = CreateRef<PhysicsObject>(
@@ -35,17 +35,25 @@ class FizzLayer : public Layer {
 		srand(time(NULL));
 
 		for (uint32_t i = 0; i < 50; i++) {
-			PolygonType polygonType =
-				static_cast<PolygonType>(std::rand() % (int) PolygonType::COUNT);
+			Ref<PhysicsObject> object;
+			Ref<Shape> shape;
+
+			if (std::rand() % (int) PolygonType::COUNT == 0) {
+				shape = CreateRef<Circle>(0.0f); // radius set by random transform
+			} else {
+				PolygonType polygonType =
+					static_cast<PolygonType>(std::rand() % (int) PolygonType::COUNT);
+				shape = CreateRef<Polygon>(polygonType);
+			}
+
 			float x = 10.0 * std::rand() / RAND_MAX - 5;
 			float y = 10.0 * std::rand() / RAND_MAX - 5;
 			float rot = 2 * 3.1415f * std::rand() / RAND_MAX;
 			float scaleX = (float) std::rand() / RAND_MAX / 2;
 			float scaleY = (float) std::rand() / RAND_MAX / 2;
 
-			Ref<PhysicsObject> object = CreateRef<PhysicsObject>(
-				CreateRef<Polygon>(polygonType),
-				Transform({glm::vec2(x, y), rot, glm::vec2(scaleX, scaleY)}));
+			object = CreateRef<PhysicsObject>(
+				shape, Transform({glm::vec2(x, y), rot, glm::vec2(scaleX, scaleY)}));
 
 			m_PhysicsEnv.Add(object);
 		}
@@ -66,13 +74,13 @@ class FizzLayer : public Layer {
 	virtual void OnImGuiRender() override {
 		ImGui::Begin("Fizziks Debug");
 
+		glm::vec2 distance =
+			GJKDistance(m_PhysicsEnv.GetObjects()[0], m_PhysicsEnv.GetObjects()[1]);
+		ImGui::Text("Distance between [0] and [1] <%-3.2f, %-3.2f>", distance.x, distance.y);
+		ImGui::Separator();
 		ImGuiShowPhysicsObjects();
 		ImGui::Separator();
 		ImGuiShowCollisions();
-
-		glm::vec2 distance =
-			GJKDistance(m_PhysicsEnv.GetObjects()[0], m_PhysicsEnv.GetObjects()[1]);
-		ImGui::Text("<%-3.2f, %-3.2f>", distance.x, distance.y);
 
 		ImGui::End();
 	}
@@ -89,17 +97,10 @@ class FizzLayer : public Layer {
 			glm::vec2 localScale = object->GetScale();
 
 			ImGui::PushID(i);
-			ImGui::Text("Polygon %u:", i + 1);
+			ImGui::Text("Object %u:", i + 1);
 			ImGui::SliderFloat2("Position", glm::value_ptr(localPos), -2.0f, 2.0f);
 			ImGui::SliderFloat("Rotation", &localRot, 0.0f, 2 * 3.1415f);
 			ImGui::SliderFloat2("Scale", glm::value_ptr(localScale), 0.0f, 2.0f);
-
-			AABB aabb = object->GetShape()->GetAABB();
-			std::string contained =
-				AABB(glm::vec2(-5.0f), glm::vec2(0.0f)).Contains(aabb) ? "true" : "false";
-			ImGui::Text("AABB: <%-.3f, %-.3f>, <%-.3f, %-.3f>", aabb.min.x, aabb.min.y, aabb.max.x,
-						aabb.max.y);
-			ImGui::Text("Contained in bottom left: %s", contained.c_str());
 			ImGui::PopID();
 
 			object->SetTransform(localPos, localRot, localScale);

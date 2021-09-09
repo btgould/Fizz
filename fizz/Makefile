@@ -77,6 +77,7 @@ GENERATED :=
 OBJECTS :=
 
 GENERATED += $(OBJDIR)/AABB.o
+GENERATED += $(OBJDIR)/Circle.o
 GENERATED += $(OBJDIR)/CollisionDetection.o
 GENERATED += $(OBJDIR)/CollisionResolution.o
 GENERATED += $(OBJDIR)/Fizz.o
@@ -86,6 +87,7 @@ GENERATED += $(OBJDIR)/Polygon.o
 GENERATED += $(OBJDIR)/Quadtree.o
 GENERATED += $(OBJDIR)/Simplex.o
 OBJECTS += $(OBJDIR)/AABB.o
+OBJECTS += $(OBJDIR)/Circle.o
 OBJECTS += $(OBJDIR)/CollisionDetection.o
 OBJECTS += $(OBJDIR)/CollisionResolution.o
 OBJECTS += $(OBJDIR)/Fizz.o
@@ -173,6 +175,9 @@ $(OBJDIR)/Fizz.o: src/Fizz.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/AABB.o: src/Objects/AABB.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/Circle.o: src/Objects/Circle.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/PhysicsObject.o: src/Objects/PhysicsObject.cpp

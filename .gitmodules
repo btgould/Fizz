@@ -1,3 +1,5 @@
 [submodule "nutella-engine"]
 	path = nutella
 	url = git@github.com:btgould/nutella-engine.git
+[submodule "nutella"]
+	branch = master
