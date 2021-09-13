@@ -49,6 +49,8 @@ namespace Fizz {
 		}
 	}
 
+	void Simplex::Remove(const uint32_t idx) { m_Points.erase(m_Points.begin() + idx); }
+
 	uint32_t Simplex::Size() const { return m_Points.size(); }
 
 	glm::vec2& Simplex::operator[](uint32_t index) { return m_Points[index]; }

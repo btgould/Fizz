@@ -74,10 +74,18 @@ class FizzLayer : public Layer {
 	virtual void OnImGuiRender() override {
 		ImGui::Begin("Fizziks Debug");
 
-		glm::vec2 distance =
-			GJKDistance(m_PhysicsEnv.GetObjects()[0], m_PhysicsEnv.GetObjects()[1]);
-		ImGui::Text("Distance between [0] and [1] <%-3.2f, %-3.2f>", distance.x, distance.y);
-		ImGui::Separator();
+		Collision collision =
+			GJKGetCollision(m_PhysicsEnv.GetObjects()[0], m_PhysicsEnv.GetObjects()[1]);
+
+		if (collision.exists) {
+			ImGui::Text("Penetration Depth: %.3f", collision.penetrationDepth);
+			ImGui::Text("Collision Normal: <%.3f. %.3f>", collision.MTV.x, collision.MTV.y);
+		} else {
+			ImGui::Text("Separation Distance: %.3f", collision.separationDist);
+			ImGui::Text("Closest Direction: <%.3f. %.3f>", collision.closestDir.x,
+						collision.closestDir.y);
+		}
+
 		ImGuiShowPhysicsObjects();
 		ImGui::Separator();
 		ImGuiShowCollisions();
@@ -119,7 +127,7 @@ class FizzLayer : public Layer {
 
 				ImGui::PushID(i);
 				ImGui::Text("Collision %d: ", i + 1);
-				ImGui::Text("Penetration Depth: %.3f", collision.penetrationDist);
+				ImGui::Text("Penetration Depth: %.3f", collision.penetrationDepth);
 				ImGui::Text("Min. Translation Vector: <%.3f, %.3f>", collision.MTV.x,
 							collision.MTV.y);
 				ImGui::PopID();

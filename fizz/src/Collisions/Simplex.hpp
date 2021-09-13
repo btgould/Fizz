@@ -47,11 +47,17 @@ namespace Fizz {
 		 */
 		void Add(const glm::vec2& point, uint32_t idx);
 
-		/* Removes the given point from the simplex.
-
-		   @param point: The point to remove
+		/** Removes the given point from the simplex.
+		 *
+		 * @param point: The point to remove
 		 */
 		void Remove(const glm::vec2& point);
+
+		/** Removes the point at the given index from the simplex.
+		 *
+		 * @param idx: The index of the point to remove
+		 */
+		void Remove(const uint32_t idx);
 
 		/* Gets the number of points in the simplex */
 		uint32_t Size() const;

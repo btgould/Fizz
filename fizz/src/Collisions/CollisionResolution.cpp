@@ -34,7 +34,7 @@ namespace Fizz {
 		// on the wrong axis (try breaking when x-comp != 0)
 
 		float correctionDist;
-		if ((correctionDist = collision.penetrationDist - penetrationThreshold) > 0) {
+		if ((correctionDist = collision.penetrationDepth - penetrationThreshold) > 0) {
 			Ref<PhysicsObject> A = collision.collider;
 			Ref<PhysicsObject> B = collision.collided;
 
