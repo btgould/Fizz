@@ -6,9 +6,9 @@ namespace Fizz {
 	/** Checks if simplex contains origin, returning true if it does. Otherwise, it removes any
 	 *  redundant points on the simplex.
 	 */
-	bool UpdateSimplex(Simplex& s);
+	bool UpdateSimplex(Simplex<glm::vec2>& s);
 	/** Calculates the normal of the simplex pointed towards the origin */
-	glm::vec2 NextDir(const Simplex& s);
+	glm::vec2 NextDir(const Simplex<glm::vec2>& s);
 
 	bool GJKColliding(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2) {
 		NT_PROFILE_FUNC();
@@ -20,7 +20,7 @@ namespace Fizz {
 
 		// add first point to simplex
 		glm::vec2 supportPoint(MinkowskiDiffSupport(p1, p2, nextDir));
-		Simplex s({supportPoint});
+		Simplex<glm::vec2> s({supportPoint});
 		nextDir = -supportPoint;
 
 		// add second point to simplex
@@ -52,7 +52,7 @@ namespace Fizz {
 		}
 	}
 
-	bool UpdateSimplex(Simplex& s) {
+	bool UpdateSimplex(Simplex<glm::vec2>& s) {
 		NT_ASSERT(s.Size() == 3, "Invalid Simplex during collision detection!");
 
 		// calculate where origin is
@@ -76,7 +76,7 @@ namespace Fizz {
 		return false;
 	}
 
-	glm::vec2 NextDir(const Simplex& s) {
+	glm::vec2 NextDir(const Simplex<glm::vec2>& s) {
 		glm::vec3 segment = glm::vec3(s[0].x - s[1].x, s[0].y - s[1].y, 0.0f);
 		glm::vec3 toOrigin = glm::vec3(-s[1].x, -s[1].y, 0.0f);
 
@@ -91,7 +91,7 @@ namespace Fizz {
 	}
 
 	/** Finds the closest point to the origin on the line segment defined by two points */
-	glm::vec2 Line(const Simplex& s) {
+	glm::vec2 Line(const Simplex<glm::vec2>& s) {
 		// TEMP: consider a way of doing this that is less senstive to fp errors
 		NT_ASSERT(s.Size() == 2, "Invalid Simplex during collision detection!");
 
@@ -115,7 +115,7 @@ namespace Fizz {
 	/** Finds the closest point to the origin on the triangle defined by three points. Also removes
 	 *  the redundant point from the simplex
 	 */
-	glm::vec2 Triangle(Simplex& s) {
+	glm::vec2 Triangle(Simplex<glm::vec2>& s) {
 		NT_ASSERT(s.Size() == 3, "Invalid Simplex during collision detection!");
 
 		// calculate where origin is
@@ -130,8 +130,8 @@ namespace Fizz {
 
 		if (proj1 > 0 && proj2 > 0) {
 			// either line from s[2] could be closest, we must check
-			glm::vec2 p1 = Line(Simplex({s[0], s[2]}));
-			glm::vec2 p2 = Line(Simplex({s[1], s[2]}));
+			glm::vec2 p1 = Line(Simplex<glm::vec2>({s[0], s[2]}));
+			glm::vec2 p2 = Line(Simplex<glm::vec2>({s[1], s[2]}));
 
 			if (glm::dot(p1, p1) > glm::dot(p2, p2)) {
 				// line using s[1] is closer
@@ -160,13 +160,13 @@ namespace Fizz {
 	 *  shortest vector from any point on p1 to any point on p2.
 	 */
 	Collision GJKDistance(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2,
-						  Simplex& s, float tolerance);
+						  Simplex<glm::vec2>& s, float tolerance);
 
 	/** Finds the closest point on the edge of the Minkowski difference to the origin, and returns
 	 *  the collision this point describes.
 	 */
-	Collision EPA(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2, Simplex& s,
-				  float tolerance);
+	Collision EPA(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2,
+				  Simplex<glm::vec2>& s, float tolerance);
 
 	Collision GJKGetCollision(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2,
 							  float tolerance /* = glm::pow(10, -4)*/) {
@@ -179,7 +179,7 @@ namespace Fizz {
 
 		// add first point to simplex
 		glm::vec2 supportPoint(MinkowskiDiffSupport(p1, p2, nextDir));
-		Simplex s({supportPoint});
+		Simplex<glm::vec2> s({supportPoint});
 		nextDir = -supportPoint;
 
 		// add second point to simplex
@@ -227,7 +227,7 @@ namespace Fizz {
 	}
 
 	Collision GJKDistance(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2,
-						  Simplex& s, float tolerance) {
+						  Simplex<glm::vec2>& s, float tolerance) {
 		NT_PROFILE_FUNC();
 
 		glm::vec2 nextDir = -Line(s);
@@ -251,8 +251,8 @@ namespace Fizz {
 		}
 	}
 
-	Collision EPA(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2, Simplex& s,
-				  float tolerance) {
+	Collision EPA(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2,
+				  Simplex<glm::vec2>& s, float tolerance) {
 		while (true) {
 			float closestDist = glm::dot(s[0], s[0]);
 			glm::vec2 closestDir(s[0]);
@@ -262,7 +262,7 @@ namespace Fizz {
 			for (uint32_t i = 0; i < s.Size(); i++) {
 				uint32_t j = i + 1 == s.Size() ? 0 : i + 1;
 
-				glm::vec2 p = Line(Simplex({s[i], s[j]}));
+				glm::vec2 p = Line(Simplex<glm::vec2>({s[i], s[j]}));
 				float newDist = glm::dot(p, p);
 
 				if (newDist < closestDist) {

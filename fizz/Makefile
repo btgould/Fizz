@@ -85,7 +85,6 @@ GENERATED += $(OBJDIR)/PhysicsEnvironment.o
 GENERATED += $(OBJDIR)/PhysicsObject.o
 GENERATED += $(OBJDIR)/Polygon.o
 GENERATED += $(OBJDIR)/Quadtree.o
-GENERATED += $(OBJDIR)/Simplex.o
 OBJECTS += $(OBJDIR)/AABB.o
 OBJECTS += $(OBJDIR)/Circle.o
 OBJECTS += $(OBJDIR)/CollisionDetection.o
@@ -95,7 +94,6 @@ OBJECTS += $(OBJDIR)/PhysicsEnvironment.o
 OBJECTS += $(OBJDIR)/PhysicsObject.o
 OBJECTS += $(OBJDIR)/Polygon.o
 OBJECTS += $(OBJDIR)/Quadtree.o
-OBJECTS += $(OBJDIR)/Simplex.o
 
 # Rules
 # #############################################
@@ -166,9 +164,6 @@ $(OBJDIR)/CollisionResolution.o: src/Collisions/CollisionResolution.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Quadtree.o: src/Collisions/Quadtree.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/Simplex.o: src/Collisions/Simplex.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Fizz.o: src/Fizz.cpp
