@@ -42,6 +42,17 @@ namespace Fizz {
 			 */
 			glm::vec2 closestDir;
 		};
+
+		/** Witness point on p1. i.e. the closest point on p1 to any point on p2. */
+		glm::vec2 witness1;
+		/** Witness point on p2. i.e. the closest point on p2 to any point on p1. */
+		glm::vec2 witness2;
+	};
+
+	struct Support {
+		glm::vec2 mkSupport;
+		glm::vec2 p1Support;
+		glm::vec2 p2Support;
 	};
 
 	/** Gets a vector representing the farthest point in the given direction on the convex hull of
@@ -52,14 +63,19 @@ namespace Fizz {
 	 *  @param p2: The second physics object (subtracted from p1)
 	 *  @param dir: The direction to get the support point in
 	 *
-	 *  @return The farthest point on p1 - p2 in the given direction
+	 *  @return The farthest point on p1 - p2 in the given direction, and the points on each body
+	 * used to make it
 	 */
-	inline glm::vec2 MinkowskiDiffSupport(const Nutella::Ref<PhysicsObject>& p1,
-										  const Nutella::Ref<PhysicsObject>& p2,
-										  const glm::vec2& dir) {
+	inline Support MinkowskiDiffSupport(const Nutella::Ref<PhysicsObject>& p1,
+										const Nutella::Ref<PhysicsObject>& p2,
+										const glm::vec2& dir) {
 		NT_PROFILE_FUNC();
 
-		return p1->GetShape()->Support(dir) - p2->GetShape()->Support(-dir);
+		glm::vec2 p1s = p1->GetShape()->Support(dir);
+		glm::vec2 p2s = p2->GetShape()->Support(-dir);
+		glm::vec2 finalSupport = p1s - p2s;
+
+		return {finalSupport, p1s, p2s};
 	}
 
 	/** Tests whether two physics bodies are colliding.

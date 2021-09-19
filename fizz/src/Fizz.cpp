@@ -21,7 +21,7 @@ class FizzLayer : public Layer {
 							 (float) Application::get().getWindow().GetHeight()) {
 
 		// Ref<PhysicsObject> moved = CreateRef<PhysicsObject>(
-		// 	CreateRef<Circle>(0.4),
+		// 	CreateRef<Circle>(0.2),
 		// 	Transform({glm::vec2(0.4f, 0.6f), 0.0f, glm::vec2(0.2f, 0.2f)}));
 
 		// Ref<PhysicsObject> floor = CreateRef<PhysicsObject>(
@@ -84,6 +84,10 @@ class FizzLayer : public Layer {
 			ImGui::Text("Separation Distance: %.3f", collision.separationDist);
 			ImGui::Text("Closest Direction: <%.3f. %.3f>", collision.closestDir.x,
 						collision.closestDir.y);
+			ImGui::Text("Witness Point 1: <%.3f. %.3f>", collision.witness1.x,
+						collision.witness1.y);
+			ImGui::Text("Witness Point 2: <%.3f. %.3f>", collision.witness2.x,
+						collision.witness2.y);
 		}
 
 		ImGuiShowPhysicsObjects();
