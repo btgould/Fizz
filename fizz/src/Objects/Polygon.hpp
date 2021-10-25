@@ -11,21 +11,21 @@
 namespace Fizz {
 	enum class PolygonType { TRIANGLE = 0, SQUARE, HEXAGON, COUNT };
 
-	/* A shape defined as the region eclosed by a series of points (vertices) and straight lines
-	   between them (edges)
+	/** A shape defined as the region eclosed by a series of points (vertices) and straight lines
+	 *  between them (edges)
 	 */
 	class Polygon : public Shape {
 	  public:
-		/* Creates a polygon from a list of 2D points. Points should be given in counter-clockwise
-		   winding order.
-
-		   @param points: A list of the polygon's vertices
-		*/
+		/** Creates a polygon from a list of 2D points. Points should be given in counter-clockwise
+		 *  winding order.
+		 *
+		 *  @param points: A list of the polygon's vertices
+		 */
 		Polygon(const std::vector<glm::vec2>& points);
 
-		/* Creates a regular polygon of the given type
-
-		   @param type: The type of polygon to create
+		/** Creates a regular polygon of the given type
+		 *
+		 *  @param type: The type of polygon to create
 		 */
 		Polygon(PolygonType type);
 		~Polygon();
@@ -36,6 +36,8 @@ namespace Fizz {
 		virtual AABB GetAABB() const override;
 
 		virtual void SetTransform(const Transform& transform) override;
+
+		virtual MassInfo GetMassInfo(const float density) override;
 
 	  private:
 		std::vector<glm::vec2> m_Points;

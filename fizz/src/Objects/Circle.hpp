@@ -18,6 +18,8 @@ namespace Fizz {
 
 		virtual void SetTransform(const Transform& transform) override;
 
+		virtual MassInfo GetMassInfo(const float density) override;
+
 	  private:
 		glm::vec2 m_Position;
 		float m_Radius;

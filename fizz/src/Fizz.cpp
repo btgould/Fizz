@@ -77,6 +77,7 @@ class FizzLayer : public Layer {
 		Collision collision =
 			GJKGetCollision(m_PhysicsEnv.GetObjects()[0], m_PhysicsEnv.GetObjects()[1]);
 
+		ImGui::Text("Collision between Objects 1 and 2:");
 		if (collision.exists) {
 			ImGui::Text("Penetration Depth: %.3f", collision.penetrationDepth);
 			ImGui::Text("Collision Normal: <%.3f. %.3f>", collision.MTV.x, collision.MTV.y);
@@ -89,6 +90,8 @@ class FizzLayer : public Layer {
 			ImGui::Text("Witness Point 2: <%.3f. %.3f>", collision.witness2.x,
 						collision.witness2.y);
 		}
+
+		ImGui::Separator();
 
 		ImGuiShowPhysicsObjects();
 		ImGui::Separator();

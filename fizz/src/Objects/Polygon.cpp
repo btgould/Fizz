@@ -126,4 +126,20 @@ namespace Fizz {
 			}
 		}
 	}
+
+	MassInfo Polygon::GetMassInfo(const float density) {
+		// HACK: currently, all polygons are treated like rectangles for mass purposes
+		AABB bounds = this->GetAABB();
+
+		float width = bounds.max.x - bounds.min.x;
+		float height = bounds.max.y - bounds.min.y;
+
+		float mass = width * height * density;
+		float invMass = 1.0f / mass;
+		float rotInertia =
+			(width * width * width * height + height * height * height * width) * density / 3.0f;
+		float invRotInertia = 1.0f / rotInertia;
+
+		return {density, mass, invMass, rotInertia, invRotInertia};
+	}
 } // namespace Fizz

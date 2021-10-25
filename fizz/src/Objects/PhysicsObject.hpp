@@ -6,34 +6,35 @@
 #include "Objects/Shape.hpp"
 
 namespace Fizz {
-	/* Represents a physics object. Objects can move, collide, and interact with each other in a
-	   physics environment.
+	/** Represents a physics object. Objects can move, collide, and interact with each other in a
+	 *  physics environment.
 	 */
 	class PhysicsObject {
 	  public:
 		PhysicsObject(Nutella::Ref<Shape> shape,
-					  Transform transform = {glm::vec2(0.0f, 0.0f), 0.0f, glm::vec2(0.2f, 0.2f)});
+					  Transform transform = {glm::vec2(0.0f, 0.0f), 0.0f, glm::vec2(0.2f, 0.2f)},
+					  float density = 1.0f);
 
-		/* Updates the position of the physics object according to its velocity and acceleration.
-
-		   @param ts: The timestep to use when updating
+		/** Updates the position of the physics object according to its velocity and acceleration.
+		 *
+		 *  @param ts: The timestep to use when updating
 		 */
 		void Update(Nutella::Timestep ts);
 
-		/* Renders the physics object on the screen */
+		/** Renders the physics object on the screen */
 		void Render();
 
-		/* Immediately changes velocity by the full size of the given impulse vector.
-
-		   @param impulse: The impulse vector to add to the velocity
+		/** Immediately changes velocity by the full size of the given impulse vector.
+		 *
+		 *  @param impulse: The impulse vector to add to the velocity
 		 */
 		inline void ApplyImpulse(const glm::vec2& impulse) { m_Velocity += impulse; }
 
-		/* Adds an force to the object. When this object is updated, the object's velocity will be
-		   changed by a portion of the force vector proportional to the inverse mass of the object
-		   and the timestep used to update it.
-
-		   @param force: The force vector to add to the object
+		/** Adds an force to the object. When this object is updated, the object's velocity will be
+		 *  changed by a portion of the force vector proportional to the inverse mass of the object
+		 *  and the timestep used to update it.
+		 *
+		 *  @param force: The force vector to add to the object
 		 */
 		inline void ApplyForce(const glm::vec2& force) { m_Force += force; }
 
@@ -63,12 +64,12 @@ namespace Fizz {
 
 		inline const glm::vec2& GetVelocity() const { return m_Velocity; }
 
-		inline float GetInvMass() const { return m_InvMass; }
-		inline void SetInvMass(float invMass) { m_InvMass = invMass; }
+		inline float GetInvMass() const { return m_MassInfo.invMass; }
+		inline void SetInvMass(float invMass) { m_MassInfo.invMass = invMass; }
 		inline float GetRestitution() const { return m_Restitution; }
 		inline void SetRestitution(float restitution) { m_Restitution = restitution; }
 
-		/* Gets the shape that this physics object uses for collision checks and rendering */
+		/** Gets the shape that this physics object uses for collision checks and rendering */
 		inline Nutella::Ref<Shape> GetShape() const { return m_Shape; }
 
 	  private:
@@ -78,7 +79,8 @@ namespace Fizz {
 		glm::vec2 m_Velocity;
 		glm::vec2 m_Force;
 
-		float m_InvMass;
+		MassInfo m_MassInfo;
+
 		float m_Restitution;
 	};
 } // namespace Fizz

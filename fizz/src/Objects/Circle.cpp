@@ -50,4 +50,15 @@ namespace Fizz {
 		m_Radius = transform.scale.x;
 		m_TRSMat = glm::scale(m_TRSMat, {m_Radius, m_Radius, 1.0f});
 	}
+
+	MassInfo Circle::GetMassInfo(const float density) {
+		float pi = 3.141592f;
+
+		float mass = pi * m_Radius * m_Radius * density;
+		float invMass = 1.0f / mass;
+		float rotInertia = pi * density * glm::pow(m_Radius, 4) / 2;
+		float invRotInertia = 1.0f / rotInertia;
+
+		return {density, mass, invMass, rotInertia, invRotInertia};
+	}
 } // namespace Fizz
