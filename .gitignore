@@ -3,6 +3,7 @@
 
 /bin/
 /bin-int/
+Makefile
 
 null.d
 
