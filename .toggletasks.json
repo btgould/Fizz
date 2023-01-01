@@ -1,0 +1,40 @@
+{
+  "tasks": [
+    {
+      "name": "clean",
+      "cmd": "make config=debug clean && make config=release clean && make config=dist clean",
+      "cwd": "${config_dir}",
+      "tags": ["clean"]
+    },
+    {
+      "name": "premake",
+      "cmd": "premake5 gmake2",
+      "cwd": "${config_dir}",
+      "tags": ["build"]
+    },
+    {
+      "name": "build_debug",
+      "cmd": "make -j 8 config=debug all",
+      "cwd": "${config_dir}",
+      "tags": ["build"]
+    },
+    {
+      "name": "build_release",
+      "cmd": "make -j 8 config=release all",
+      "cwd": "${config_dir}",
+      "tags": ["build"]
+    },
+    {
+      "name": "build_dist",
+      "cmd": "make -j 8 config=dist all",
+      "cwd": "${config_dir}",
+      "tags": ["build"]
+    },
+    {
+      "name": "debug",
+      "cmd": "~/dev/Fizz/bin/Debug-linux-x86_64/Fizz/Fizz",
+      "cwd": "~/dev/Fizz",
+      "tags": ["debug"]
+    }
+  ]
+}
