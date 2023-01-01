@@ -67,8 +67,8 @@ namespace Fizz {
 	 * used to make it
 	 */
 	inline Support MinkowskiDiffSupport(const Nutella::Ref<PhysicsObject>& p1,
-										const Nutella::Ref<PhysicsObject>& p2,
-										const glm::vec2& dir) {
+	                                    const Nutella::Ref<PhysicsObject>& p2,
+	                                    const glm::vec2& dir) {
 		NT_PROFILE_FUNC();
 
 		glm::vec2 p1s = p1->GetShape()->Support(dir);
@@ -111,6 +111,6 @@ namespace Fizz {
 	 *  @return Details about the collision between p1 and p2
 	 */
 	Collision GJKGetCollision(Nutella::Ref<PhysicsObject>& p1, Nutella::Ref<PhysicsObject>& p2,
-							  float tolerance = glm::pow(10, -5));
+	                          float tolerance = glm::pow(10, -5));
 
 } // namespace Fizz

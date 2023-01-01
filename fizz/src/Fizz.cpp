@@ -5,6 +5,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Nutella/Core/Core.hpp"
+#include "Objects/PhysicsObject.hpp"
 #include "Objects/Polygon.hpp"
 #include "Objects/Circle.hpp"
 #include "Collisions/Simplex.hpp"
@@ -18,45 +20,17 @@ class FizzLayer : public Layer {
 	FizzLayer()
 		: Layer("Fizziks Simulation"),
 		  m_CameraController((float) Application::get().getWindow().GetWidth() /
-							 (float) Application::get().getWindow().GetHeight()) {
+	                         (float) Application::get().getWindow().GetHeight()) {
 
-		// Ref<PhysicsObject> moved = CreateRef<PhysicsObject>(
-		// 	CreateRef<Circle>(0.2),
-		// 	Transform({glm::vec2(0.4f, 0.6f), 0.0f, glm::vec2(0.2f, 0.2f)}));
+		Ref<Shape> circle = CreateRef<Circle>(1);
+		Ref<Shape> square = CreateRef<Polygon>(PolygonType::SQUARE);
 
-		// Ref<PhysicsObject> floor = CreateRef<PhysicsObject>(
-		// 	CreateRef<Polygon>(PolygonType::SQUARE),
-		// 	Transform({glm::vec2(0.0f, -0.6f), 0.0f, glm::vec2(1.0f, 0.2f)}));
-		// floor->SetInvMass(0.0f);
-
-		// m_PhysicsEnv.Add(moved);
-		// m_PhysicsEnv.Add(floor);
-
-		srand(time(NULL));
-
-		for (uint32_t i = 0; i < 50; i++) {
-			Ref<PhysicsObject> object;
-			Ref<Shape> shape;
-
-			if (std::rand() % (int) PolygonType::COUNT == 0) {
-				shape = CreateRef<Circle>(0.0f); // radius set by random transform
-			} else {
-				PolygonType polygonType =
-					static_cast<PolygonType>(std::rand() % (int) PolygonType::COUNT);
-				shape = CreateRef<Polygon>(polygonType);
-			}
-
-			float x = 10.0 * std::rand() / RAND_MAX - 5;
-			float y = 10.0 * std::rand() / RAND_MAX - 5;
-			float rot = 2 * 3.1415f * std::rand() / RAND_MAX;
-			float scaleX = (float) std::rand() / RAND_MAX / 2;
-			float scaleY = (float) std::rand() / RAND_MAX / 2;
-
-			object = CreateRef<PhysicsObject>(
-				shape, Transform({glm::vec2(x, y), rot, glm::vec2(scaleX, scaleY)}));
-
-			m_PhysicsEnv.Add(object);
-		}
+		Ref<PhysicsObject> pivot = CreateRef<PhysicsObject>(
+			square, Transform({glm::vec2(0, 0), 0, glm::vec2(0.1f, 0.1f)}));
+		Ref<PhysicsObject> pend = CreateRef<PhysicsObject>(
+			circle, Transform({glm::vec2(0, -0.5f), 0, glm::vec2(0.1f, 0.1f)}));
+		m_PhysicsEnv.Add(pivot);
+		m_PhysicsEnv.Add(pend);
 	}
 
 	virtual void OnUpdate(Timestep ts) override {
@@ -84,11 +58,11 @@ class FizzLayer : public Layer {
 		} else {
 			ImGui::Text("Separation Distance: %.3f", collision.separationDist);
 			ImGui::Text("Closest Direction: <%.3f. %.3f>", collision.closestDir.x,
-						collision.closestDir.y);
+			            collision.closestDir.y);
 			ImGui::Text("Witness Point 1: <%.3f. %.3f>", collision.witness1.x,
-						collision.witness1.y);
+			            collision.witness1.y);
 			ImGui::Text("Witness Point 2: <%.3f. %.3f>", collision.witness2.x,
-						collision.witness2.y);
+			            collision.witness2.y);
 		}
 
 		ImGui::Separator();
@@ -136,7 +110,7 @@ class FizzLayer : public Layer {
 				ImGui::Text("Collision %d: ", i + 1);
 				ImGui::Text("Penetration Depth: %.3f", collision.penetrationDepth);
 				ImGui::Text("Min. Translation Vector: <%.3f, %.3f>", collision.MTV.x,
-							collision.MTV.y);
+				            collision.MTV.y);
 				ImGui::PopID();
 			}
 		}
