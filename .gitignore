@@ -1,10 +1,13 @@
+# vscode
 .vscode/
 *.code-workspace
+null.d
+
+# clang
+.cache
 
 /bin/
 /bin-int/
 Makefile
-
-null.d
 
 *Profile.json
