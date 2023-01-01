@@ -12,8 +12,8 @@ namespace Fizz {
 	class PhysicsObject {
 	  public:
 		PhysicsObject(Nutella::Ref<Shape> shape,
-					  Transform transform = {glm::vec2(0.0f, 0.0f), 0.0f, glm::vec2(0.2f, 0.2f)},
-					  float density = 1.0f);
+		              Transform transform = {glm::vec2(0.0f, 0.0f), 0.0f, glm::vec2(0.2f, 0.2f)},
+		              float density = 1.0f);
 
 		/** Updates the position of the physics object according to its velocity and acceleration.
 		 *
@@ -63,6 +63,7 @@ namespace Fizz {
 		}
 
 		inline const glm::vec2& GetVelocity() const { return m_Velocity; }
+		inline const glm::vec2& GetForce() const { return m_Force; }
 
 		inline float GetInvMass() const { return m_MassInfo.invMass; }
 		inline void SetInvMass(float invMass) { m_MassInfo.invMass = invMass; }

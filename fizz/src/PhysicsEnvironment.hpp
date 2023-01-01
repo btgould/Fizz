@@ -39,6 +39,8 @@ namespace Fizz {
 
 	  private:
 		void UpdateObjects(Nutella::Timestep ts);
+		void ResolveConstraints(Nutella::Timestep ts);
+
 		void FindCollisions();
 		void ResolveCollisions();
 

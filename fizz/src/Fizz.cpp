@@ -27,8 +27,9 @@ class FizzLayer : public Layer {
 
 		Ref<PhysicsObject> pivot = CreateRef<PhysicsObject>(
 			square, Transform({glm::vec2(0, 0), 0, glm::vec2(0.1f, 0.1f)}));
+		pivot->SetInvMass(0.0f);
 		Ref<PhysicsObject> pend = CreateRef<PhysicsObject>(
-			circle, Transform({glm::vec2(0, -0.5f), 0, glm::vec2(0.1f, 0.1f)}));
+			circle, Transform({glm::vec2(0.3f, 0.0f), 0, glm::vec2(0.1f, 0.1f)}));
 		m_PhysicsEnv.Add(pivot);
 		m_PhysicsEnv.Add(pend);
 	}
@@ -36,8 +37,8 @@ class FizzLayer : public Layer {
 	virtual void OnUpdate(Timestep ts) override {
 		m_CameraController.OnUpdate(ts);
 
-		// for (Ref<PhysicsObject> object : m_PhysicsEnv.GetObjects())
-		// 	object->ApplyForce(glm::vec2(0.0f, -0.5f)); // gravity
+		for (Ref<PhysicsObject> object : m_PhysicsEnv.GetObjects())
+			object->ApplyForce(glm::vec2(0.0f, -0.5f)); // gravity
 		m_PhysicsEnv.Update(ts);
 
 		Renderer::BeginScene(m_CameraController.GetCamera());

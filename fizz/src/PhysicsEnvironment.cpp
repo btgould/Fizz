@@ -1,7 +1,8 @@
 #include "PhysicsEnvironment.hpp"
-
 #include "Collisions/CollisionResolution.hpp"
 #include "Collisions/Quadtree.hpp"
+#include "glm/fwd.hpp"
+#include "glm/geometric.hpp"
 
 using namespace Nutella;
 using namespace Fizz;
@@ -10,9 +11,10 @@ namespace Fizz {
 	void PhysicsEnvironment::Update(Nutella::Timestep ts) {
 		NT_PROFILE_FUNC();
 
-		UpdateObjects(ts);
 		FindCollisions();
-		ResolveCollisions();
+		ResolveConstraints(ts);
+		UpdateObjects(ts);
+		// ResolveCollisions();
 	}
 
 	void PhysicsEnvironment::Render() {
@@ -23,6 +25,15 @@ namespace Fizz {
 	void PhysicsEnvironment::UpdateObjects(Nutella::Timestep ts) {
 		for (Ref<PhysicsObject>& object : m_Objects)
 			object->Update(ts);
+	}
+	void PhysicsEnvironment::ResolveConstraints(Nutella::Timestep ts) {
+		glm::vec2 fExt = m_Objects[1]->GetForce();
+		glm::vec2 pos = m_Objects[1]->GetPos();
+		glm::vec2 vel = m_Objects[1]->GetVelocity();
+		float mass = 1.0f / m_Objects[1]->GetInvMass();
+
+		float lambda = (-glm::dot(fExt, pos) - mass * glm::dot(vel, vel)) / glm::dot(pos, pos);
+		m_Objects[1]->ApplyForce(lambda * pos);
 	}
 
 	void PhysicsEnvironment::FindCollisions() {
