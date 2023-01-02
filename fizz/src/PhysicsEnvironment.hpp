@@ -37,6 +37,9 @@ namespace Fizz {
 		 */
 		inline std::vector<Fizz::Collision>& GetCollisions() { return m_Collisions; };
 
+		float springConstant,
+			dampingConstant; // TODO: this should really be a member of a constraint class
+
 	  private:
 		void UpdateObjects(Nutella::Timestep ts);
 		void ResolveConstraints(Nutella::Timestep ts);

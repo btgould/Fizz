@@ -26,12 +26,15 @@ class FizzLayer : public Layer {
 		Ref<Shape> square = CreateRef<Polygon>(PolygonType::SQUARE);
 
 		Ref<PhysicsObject> pivot = CreateRef<PhysicsObject>(
-			square, Transform({glm::vec2(0, 0), 0, glm::vec2(0.1f, 0.1f)}));
+			square, Transform({glm::vec2(0, 0), 0, glm::vec2(0.05f, 0.05f)}));
 		pivot->SetInvMass(0.0f);
 		Ref<PhysicsObject> pend = CreateRef<PhysicsObject>(
-			circle, Transform({glm::vec2(0.3f, 0.0f), 0, glm::vec2(0.1f, 0.1f)}));
+			circle, Transform({glm::vec2(0.5f, 0.0f), 0, glm::vec2(0.1f, 0.1f)}));
 		m_PhysicsEnv.Add(pivot);
 		m_PhysicsEnv.Add(pend);
+
+		m_PhysicsEnv.springConstant = 0.7;
+		m_PhysicsEnv.dampingConstant = 0.15;
 	}
 
 	virtual void OnUpdate(Timestep ts) override {
@@ -48,6 +51,12 @@ class FizzLayer : public Layer {
 
 	virtual void OnImGuiRender() override {
 		ImGui::Begin("Fizziks Debug");
+
+		ImGui::SliderFloat("Spring Constant", &m_PhysicsEnv.springConstant, 0.001, 1);
+		ImGui::SliderFloat("Damping Constant", &m_PhysicsEnv.dampingConstant, 0.001, 1);
+		float distance = glm::distance(glm::vec2(m_PhysicsEnv.GetObjects()[0]->GetPos()),
+		                               glm::vec2(m_PhysicsEnv.GetObjects()[1]->GetPos()));
+		ImGui::Text("Pendulum distance: %0.3f", distance);
 
 		Collision collision =
 			GJKGetCollision(m_PhysicsEnv.GetObjects()[0], m_PhysicsEnv.GetObjects()[1]);
