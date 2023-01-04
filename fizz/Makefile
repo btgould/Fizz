@@ -83,6 +83,7 @@ GENERATED += $(OBJDIR)/CollisionResolution.o
 GENERATED += $(OBJDIR)/Fizz.o
 GENERATED += $(OBJDIR)/PhysicsEnvironment.o
 GENERATED += $(OBJDIR)/PhysicsObject.o
+GENERATED += $(OBJDIR)/PointDistanceConstraint.o
 GENERATED += $(OBJDIR)/Polygon.o
 GENERATED += $(OBJDIR)/Quadtree.o
 OBJECTS += $(OBJDIR)/AABB.o
@@ -92,6 +93,7 @@ OBJECTS += $(OBJDIR)/CollisionResolution.o
 OBJECTS += $(OBJDIR)/Fizz.o
 OBJECTS += $(OBJDIR)/PhysicsEnvironment.o
 OBJECTS += $(OBJDIR)/PhysicsObject.o
+OBJECTS += $(OBJDIR)/PointDistanceConstraint.o
 OBJECTS += $(OBJDIR)/Polygon.o
 OBJECTS += $(OBJDIR)/Quadtree.o
 
@@ -164,6 +166,9 @@ $(OBJDIR)/CollisionResolution.o: src/Collisions/CollisionResolution.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Quadtree.o: src/Collisions/Quadtree.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/PointDistanceConstraint.o: src/Constraints/PointDistanceConstraint.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Fizz.o: src/Fizz.cpp

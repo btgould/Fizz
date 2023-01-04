@@ -5,6 +5,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Constraints/Constraint.hpp"
+#include "Constraints/PointDistanceConstraint.hpp"
 #include "Nutella/Core/Core.hpp"
 #include "Objects/PhysicsObject.hpp"
 #include "Objects/Polygon.hpp"
@@ -30,11 +32,11 @@ class FizzLayer : public Layer {
 		pivot->SetInvMass(0.0f);
 		Ref<PhysicsObject> pend = CreateRef<PhysicsObject>(
 			circle, Transform({glm::vec2(0.5f, 0.0f), 0, glm::vec2(0.1f, 0.1f)}));
-		m_PhysicsEnv.Add(pivot);
-		m_PhysicsEnv.Add(pend);
+		m_PhysicsEnv.AddObject(pivot);
+		m_PhysicsEnv.AddObject(pend);
 
-		m_PhysicsEnv.springConstant = 0.7;
-		m_PhysicsEnv.dampingConstant = 0.15;
+		m_Constraint = CreateRef<PointDistanceConstraint>(pend, glm::vec2(0.0f, 0.0f), 0.5f);
+		m_PhysicsEnv.AddConstraint(m_Constraint);
 	}
 
 	virtual void OnUpdate(Timestep ts) override {
@@ -52,34 +54,24 @@ class FizzLayer : public Layer {
 	virtual void OnImGuiRender() override {
 		ImGui::Begin("Fizziks Debug");
 
-		ImGui::SliderFloat("Spring Constant", &m_PhysicsEnv.springConstant, 0.001, 1);
-		ImGui::SliderFloat("Damping Constant", &m_PhysicsEnv.dampingConstant, 0.001, 1);
+		// modify feedback constants for pendulum
+		float springConstant = m_Constraint->GetSpringConstant();
+		float dampingConstant = m_Constraint->GetDampingConstant();
+		ImGui::SliderFloat("Spring Constant", &springConstant, 0.001, 1);
+		ImGui::SliderFloat("Damping Constant", &dampingConstant, 0.001, 1);
+		m_Constraint->SetSpringConstant(springConstant);
+		m_Constraint->SetDampingConstant(dampingConstant);
+
+		// display info about constraint performance
 		float distance = glm::distance(glm::vec2(m_PhysicsEnv.GetObjects()[0]->GetPos()),
 		                               glm::vec2(m_PhysicsEnv.GetObjects()[1]->GetPos()));
 		ImGui::Text("Pendulum distance: %0.3f", distance);
 
-		Collision collision =
-			GJKGetCollision(m_PhysicsEnv.GetObjects()[0], m_PhysicsEnv.GetObjects()[1]);
-
-		ImGui::Text("Collision between Objects 1 and 2:");
-		if (collision.exists) {
-			ImGui::Text("Penetration Depth: %.3f", collision.penetrationDepth);
-			ImGui::Text("Collision Normal: <%.3f. %.3f>", collision.MTV.x, collision.MTV.y);
-		} else {
-			ImGui::Text("Separation Distance: %.3f", collision.separationDist);
-			ImGui::Text("Closest Direction: <%.3f. %.3f>", collision.closestDir.x,
-			            collision.closestDir.y);
-			ImGui::Text("Witness Point 1: <%.3f. %.3f>", collision.witness1.x,
-			            collision.witness1.y);
-			ImGui::Text("Witness Point 2: <%.3f. %.3f>", collision.witness2.x,
-			            collision.witness2.y);
-		}
-
 		ImGui::Separator();
 
 		ImGuiShowPhysicsObjects();
-		ImGui::Separator();
-		ImGuiShowCollisions();
+		// ImGui::Separator();
+		// ImGuiShowCollisions();
 
 		ImGui::End();
 	}
@@ -129,6 +121,7 @@ class FizzLayer : public Layer {
   private:
 	OrthoCamController m_CameraController;
 	PhysicsEnvironment m_PhysicsEnv;
+	Ref<PointDistanceConstraint> m_Constraint;
 };
 
 class Sandbox : public Application {

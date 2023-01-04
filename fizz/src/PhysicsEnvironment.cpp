@@ -2,8 +2,6 @@
 #include "Collisions/CollisionResolution.hpp"
 #include "Collisions/Quadtree.hpp"
 #include "Nutella/Core/Log.hpp"
-#include "glm/fwd.hpp"
-#include "glm/geometric.hpp"
 
 using namespace Nutella;
 using namespace Fizz;
@@ -28,21 +26,10 @@ namespace Fizz {
 			object->Update(ts);
 	}
 	void PhysicsEnvironment::ResolveConstraints(Nutella::Timestep ts) {
-		glm::vec2 fExt = m_Objects[1]->GetForce();
-		glm::vec2 pos = m_Objects[1]->GetPos();
-		glm::vec2 vel = m_Objects[1]->GetVelocity();
-		float mass = 1.0f / m_Objects[1]->GetInvMass();
-
-		float constraintEval = glm::dot(pos, pos) - 0.25f;
-		NT_INFO("cMag: {0}", glm::dot(pos, pos));
-		float constraintLinEval = glm::dot(pos, vel);
-		// float springConstant = 15.0f;
-		// float dampingConstant = 1.0f;
-		float feedback = springConstant * constraintEval + dampingConstant * constraintLinEval;
-
-		float lambda =
-			(-glm::dot(fExt, pos) - mass * glm::dot(vel, vel) - feedback) / glm::dot(pos, pos);
-		m_Objects[1]->ApplyForce(lambda * pos);
+		// TODO: resolve as a system of equations, not individually
+		for (auto& constraint : m_Constraints) {
+			constraint->Resolve();
+		}
 	}
 
 	void PhysicsEnvironment::FindCollisions() {
